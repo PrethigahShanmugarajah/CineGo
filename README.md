@@ -1,3 +1,3 @@
 # CineGo
 
-CineGo is a full-stack MERN movie ticket booking app like BookMyShow. It features responsive React UI, real-time seat booking, user/admin authentication, and a Node.js + MongoDB backend, perfect for portfolios, major projects, and learning full-stack development.
+CineGo is a full-stack MERN movie ticket booking app like BookMyShow. It includes a responsive React UI, real-time seat selection, user and admin authentication, and a Node.js + MongoDB backend to manage movies, shows, theaters, and bookings efficiently.
