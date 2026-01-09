@@ -1,6 +1,6 @@
 // CineGo / Client / src / App.jsx
 import { Route, Routes } from "react-router-dom";
-import Navbar from "./components/Navbar";
+import Navbar from "./components/Navbar/Navbar";
 import Home from "./pages/Home";
 import Footer from "./components/Footer";
 import Login from "./pages/Login";
@@ -20,6 +20,7 @@ const App = () => {
     <>
       <ToastContainer />
       <div className="min-h-screen w-full overflow-x-hidden">
+        {/* <Navbar /> */}
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
