@@ -1,0 +1,66 @@
+/* CineGo / Client / src / components / News / News.css */
+@import url("https://fonts.googleapis.com/css2?family=Monoton&family=Roboto:wght@300;400;700&display=swap");
+
+.font-monoton {
+  font-family: "Monoton", cursive;
+}
+
+.font-roboto {
+  font-family: "Roboto", sans-serif;
+}
+
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+@keyframes floatUp {
+  0% {
+    transform: translateY(0);
+    opacity: 0.9;
+  }
+  50% {
+    transform: translateY(-6px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 0.95;
+  }
+}
+
+.animate-fadeIn {
+  animation: floatUp 6s ease-in-out infinite;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (max-width: 640px) {
+  header {
+    padding-top: 1.25rem;
+  }
+  .line-clamp-4 {
+    -webkit-line-clamp: 3;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1023px) {
+  .line-clamp-4 {
+    -webkit-line-clamp: 4;
+  }
+}
