@@ -1,0 +1,21 @@
+/* CineGo / Client / src / components / Footer / Footer.css */
+@keyframes float {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-18px) rotate(8deg);
+  }
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+}
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+  will-change: transform;
+}
+
+.footer-logo-text {
+  font-family: "Monoton", cursive;
+}
