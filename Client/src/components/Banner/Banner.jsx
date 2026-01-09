@@ -1,5 +1,4 @@
 // CineGo / Client / src / components / Banner / Banner.jsx
-import { bannerStyles } from "../../assets/dummyStyles";
 import Video from "../../assets/MovieBannerVideo.mp4";
 import { Info, Star, Tickets } from "lucide-react";
 import "./Banner.css";
@@ -30,12 +29,13 @@ const Banner = () => {
             className="text-4xl sm:text-5xl md:text-7xl font-bold text-white mb-4 leading-tight"
             style={{ fontFamily: "'Dancing Script', 'cursive'" }}
           >
-            Ocean'Legacy
+            The Horizon Beyond
           </h1>
 
           <p className="text-sm sm:text-base md:text-lg text-white mb-6 max-w-lg">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed,
-            consectetur? Vitae, corrupti! Velit deserunt reiciendis corrupti?
+            Embark on an epic journey through uncharted lands, where bravery and
+            friendship are tested, legends are born, and destiny awaits those
+            who dare to chase it.
           </p>
 
           <div className="flex items-center mr-2">
@@ -51,12 +51,12 @@ const Banner = () => {
               </div>
 
               <span className="ml-2 text-white text-sm sm:text-base">
-                4.8/5
+                4.9/5
               </span>
             </div>
 
             <div className="text-white text-xs sm:text-sm">
-              Adventure + Fantasy + Drama
+              Adventure • Epic • Fantasy
             </div>
           </div>
 
@@ -71,7 +71,7 @@ const Banner = () => {
 
             <a
               href="/contact"
-              className="bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm px-4 sm:px-6 py-2.5 sm:py-3 rounded-full flex items-center transition-all duration-300 border border-white/30 text-sm sm:text-base"
+              className="bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm px-4 sm:px-6 py-2.5 sm:py-3 rounded-full flex items-center transition-all duration-300 border border-gray-300 text-sm sm:text-base"
             >
               <Info className="h-4 w-4 sm:h-5 sm:w-5 mr-2" /> More Info
             </a>
