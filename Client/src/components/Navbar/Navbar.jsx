@@ -1,4 +1,4 @@
-// CineGo / Client / src / components / Navbar.jsx
+// CineGo / Client / src / components / Navbar / Navbar.jsx
 import { useEffect, useRef, useState } from "react";
 import {
   Calendar,
@@ -255,7 +255,7 @@ const Navbar = () => {
                 );
               })}
 
-              <div className="pt-2 border-t border-gray-800 mt-1">
+              <div className="pt-2 border-t border-gray-300 mt-1">
                 {isLoggedIn ? (
                   <button
                     onClick={() => {
