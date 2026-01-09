@@ -1,0 +1,18 @@
+/* CineGo / Client / src / components / Banner / Banner.css */
+@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap");
+
+video {
+  display: block;
+}
+
+@media (max-width: 420px) {
+  .banner-max-w-2xl {
+    max-width: 92%;
+  }
+  .banner-h1 {
+    font-size: 1.6rem;
+  }
+  .banner-p {
+    font-size: 0.9rem;
+  }
+}
