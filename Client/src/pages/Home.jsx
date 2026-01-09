@@ -1,5 +1,5 @@
 // CineGo / Client / src / pages / Home.jsx
-import Banner from "../components/Banner";
+import Banner from "../components/Banner/Banner";
 import Movies from "../components/Movies";
 import News from "../components/News";
 import Trailers from "../components/Trailers";
