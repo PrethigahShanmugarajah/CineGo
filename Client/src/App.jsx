@@ -2,7 +2,7 @@
 import { Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Home from "./pages/Home";
-import Footer from "./components/Footer";
+import Footer from "./components/Footer/Footer";
 import Login from "./pages/Login";
 import { ToastContainer } from "react-toastify";
 import SignUp from "./pages/SignUp";
