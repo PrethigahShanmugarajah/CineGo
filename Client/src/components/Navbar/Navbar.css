@@ -1,0 +1,66 @@
+/* CineGo / Client / src / components / Navbar / Navbar.css */
+.nav-pill-btn {
+  position: relative;
+}
+
+.pill-border {
+  position: absolute;
+  inset: -2px;
+  border-radius: 9999px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(168, 85, 247, 0.18),
+    rgba(126, 34, 206, 0.08)
+  );
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.28s ease;
+}
+
+.group:hover .pill-border,
+.nav-pill-btn.active + .pill-border,
+.nav-pill-btn.active ~ .pill-border {
+  transform: scaleX(1);
+}
+
+.pill-underline {
+  height: 2px;
+  width: 40%;
+  border-radius: 999px;
+  margin-top: 4px;
+  background: linear-gradient(90deg, #c084fc, #9333ea);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.28s ease;
+}
+
+.nav-pill-btn:hover .pill-underline,
+.nav-pill-btn.active .pill-underline {
+  transform: scaleX(1);
+}
+
+@media (max-width: 767px) {
+  nav {
+    left: 8px;
+    right: 8px;
+    top: 8px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  nav {
+    left: 12px;
+    right: 12px;
+    top: 12px;
+    border-radius: 20px !important;
+    padding: 8px 0 !important;
+  }
+}
+
+@media (min-width: 1024px) {
+  .nav-pill-btn:hover,
+  .nav-pill-btn.active {
+    transform: translateY(-2px);
+  }
+}
