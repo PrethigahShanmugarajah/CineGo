@@ -13,6 +13,7 @@ import {
   Menu,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import "./Navbar.css";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
