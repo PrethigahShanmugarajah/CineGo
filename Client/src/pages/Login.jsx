@@ -1,5 +1,5 @@
-// CineGo / Client / src / components / Login.jsx
-import LoginPage from "../components/LoginPage";
+// CineGo / Client / src / pages / Login.jsx
+import LoginPage from "../components/LoginPage/LoginPage";
 
 const Login = () => {
   return (
