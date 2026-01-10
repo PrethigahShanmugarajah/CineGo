@@ -15,11 +15,11 @@ button {
 
 .Toastify__toast {
   font-family: "Inria Serif", serif;
-  color: #000000;
+  color: #ffffff;
 }
 
 .Toastify__close-button {
-  color: #000000;
+  color: #ffffff;
   opacity: 1;
 }
 
