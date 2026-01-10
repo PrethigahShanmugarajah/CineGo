@@ -1,14 +1,7 @@
 // CineGo / Client / src / components / LoginPage / LoginPage.jsx
 import { useState } from "react";
 import { toast } from "react-toastify";
-import {
-  ArrowLeft,
-  Clapperboard,
-  Eye,
-  EyeOff,
-  Film,
-  Popcorn,
-} from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Film, Mail, Popcorn } from "lucide-react";
 import "./LoginPage.css";
 
 const LoginPage = () => {
@@ -122,11 +115,11 @@ const LoginPage = () => {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-800/60 text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all duration-200 border border-gray-300 placeholder-gray-500"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-800/60 text-white rounded-lg focus:outline-none transition-all duration-200 border border-gray-300 placeholder-gray-500"
                     placeholder="Email Address..."
                   />
                   <div className="absolute right-3 top-2.5 sm:top-3">
-                    <Clapperboard size={16} className="text-purple-500" />
+                    <Mail size={16} className="text-purple-500" />
                   </div>
                 </div>
               </div>
@@ -147,7 +140,7 @@ const LoginPage = () => {
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-800/60 text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none transition-all duration-200 border border-gray-300 placeholder-gray-500"
+                    className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-800/60 text-white rounded-lg focus:outline-none transition-all duration-200 border border-gray-300 placeholder-gray-500"
                     placeholder="Password..."
                   />
                   <button
@@ -156,9 +149,9 @@ const LoginPage = () => {
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? (
-                      <EyeOff size={18} className="text-purple-300" />
+                      <EyeOff size={18} className="text-purple-500" />
                     ) : (
-                      <Eye size={18} className="text-purple-300" />
+                      <Eye size={18} className="text-purple-500" />
                     )}
                   </button>
                 </div>
