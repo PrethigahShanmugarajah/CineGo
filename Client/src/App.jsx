@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Footer from "./components/Footer/Footer";
 import Login from "./pages/Login";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import SignUp from "./pages/SignUp";
 import Movie from "./pages/Movie";
 import Release from "./pages/Release";
@@ -18,9 +19,8 @@ import SeatSelectorPageHome from "./components/SeatSelectorPageHome";
 const App = () => {
   return (
     <>
-      <ToastContainer />
+      <ToastContainer theme="dark" style={{ zIndex: 9999 }} />
       <div className="min-h-screen w-full overflow-x-hidden">
-        {/* <Navbar /> */}
         <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
