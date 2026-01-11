@@ -6,7 +6,7 @@ const connectDB = async () => {
     mongoose.connection.on("connected", () =>
       console.log("Database Connected!")
     );
-    await mongoose.connect(`${process.env.MONGODB_URL}/BiteRoute`);
+    await mongoose.connect(`${process.env.MONGODB_URL}/CineGo`);
   } catch (error) {
     console.log("Database Connection Error:", error.message);
   }
