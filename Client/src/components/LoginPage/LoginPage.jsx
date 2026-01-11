@@ -181,6 +181,18 @@ const LoginPage = () => {
                 )}
               </button>
             </form>
+
+            <div className="text-center mt-6 sm:mt-8">
+              <p className="text-gray-500 text-sm sm:text-base">
+                Don't have an account?{" "}
+                <a
+                  href="/signup"
+                  className="text-purple-400 hover:text-purple-300 font-medium transition duration-200 underline hover:no-underline"
+                >
+                  Create one now
+                </a>{" "}
+              </p>
+            </div>
           </div>
         </div>
 
