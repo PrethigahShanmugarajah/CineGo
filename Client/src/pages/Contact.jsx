@@ -1,5 +1,5 @@
 // CineGo / Client / src / pages / Contact.jsx
-import ContactPage from "../components/ContactPage";
+import ContactPage from "../components/ContactPage/ContactPage";
 
 const Contact = () => {
   return (
