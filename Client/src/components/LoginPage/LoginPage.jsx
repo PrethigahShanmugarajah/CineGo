@@ -104,7 +104,7 @@ const LoginPage = () => {
                   htmlFor="email"
                   className="block text-purple-100 text-sm font-bold mb-2 font-cinema"
                 >
-                  Email Address
+                  Email Address <span className="text-red-500">*</span>
                 </label>
 
                 <div className="relative">
@@ -129,7 +129,7 @@ const LoginPage = () => {
                   htmlFor="password"
                   className="block text-purple-100 text-sm font-bold mb-2 font-cinema"
                 >
-                  Password
+                  Password <span className="text-red-500">*</span>
                 </label>
 
                 <div className="relative">
