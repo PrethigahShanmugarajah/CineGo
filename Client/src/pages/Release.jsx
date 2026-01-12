@@ -1,5 +1,5 @@
-// CineGo / Client / src / components / Release.jsx
-import ReleasePage from "../components/ReleasePage";
+// CineGo / Client / src / pages / Release.jsx
+import ReleasePage from "../components/ReleasePage/ReleasePage";
 
 const Release = () => {
   return (
