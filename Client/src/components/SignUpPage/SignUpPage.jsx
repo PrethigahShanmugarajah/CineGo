@@ -185,7 +185,7 @@ const SignUpPage = () => {
                     htmlFor="fullName"
                     className="block text-purple-100 text-sm font-bold mb-2 font-cinema"
                   >
-                    Full Name
+                    Full Name <span className="text-red-500">*</span>
                   </label>
 
                   <div className="relative">
@@ -220,7 +220,7 @@ const SignUpPage = () => {
                     htmlFor="username"
                     className="block text-purple-100 text-sm font-bold mb-2 font-cinema"
                   >
-                    User Name
+                    User Name <span className="text-red-500">*</span>
                   </label>
 
                   <div className="relative">
@@ -257,7 +257,7 @@ const SignUpPage = () => {
                     htmlFor="email"
                     className="block text-purple-100 text-sm font-bold mb-2 font-cinema"
                   >
-                    Email
+                    Email <span className="text-red-500">*</span>
                   </label>
 
                   <div className="relative">
@@ -290,7 +290,7 @@ const SignUpPage = () => {
                     htmlFor="phone"
                     className="block text-purple-100 text-sm font-bold mb-2 font-cinema"
                   >
-                    Phone
+                    Phone <span className="text-red-500">*</span>
                   </label>
 
                   <div className="relative">
@@ -325,7 +325,7 @@ const SignUpPage = () => {
                     htmlFor="birthDate"
                     className="block text-purple-100 text-sm font-bold mb-2 font-cinema"
                   >
-                    Date Of birth
+                    Date Of birth <span className="text-red-500">*</span>
                   </label>
 
                   <div className="relative">
@@ -359,7 +359,7 @@ const SignUpPage = () => {
                     htmlFor="password"
                     className="block text-purple-100 text-sm font-bold mb-2 font-cinema"
                   >
-                    Password
+                    Password <span className="text-red-500">*</span>
                   </label>
 
                   <div className="relative">
