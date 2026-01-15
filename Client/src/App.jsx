@@ -11,7 +11,7 @@ import Movie from "./pages/Movie";
 import Release from "./pages/Release";
 import Booking from "./pages/Booking";
 import Contact from "./pages/Contact";
-import MovieDetailPage from "./pages/MovieDetailPage";
+import MovieDetailPage from "./pages/MovieDetailPage/MovieDetailPage";
 import MovieDetailPageHome from "./pages/MovieDetailPageHome";
 import SeatSelector from "./pages/SeatSelector";
 import SeatSelectorPageHome from "./components/SeatSelectorPageHome";
