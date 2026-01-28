@@ -12,7 +12,7 @@ import Release from "./pages/Release";
 import Booking from "./pages/Booking";
 import Contact from "./pages/Contact";
 import MovieDetailPage from "./pages/MovieDetailPage/MovieDetailPage";
-import MovieDetailPageHome from "./pages/MovieDetailPageHome";
+import MovieDetailPageHome from "./pages/MovieDetailPageHome/MovieDetailPageHome";
 import SeatSelector from "./pages/SeatSelector";
 import SeatSelectorPageHome from "./components/SeatSelectorPageHome";
 
