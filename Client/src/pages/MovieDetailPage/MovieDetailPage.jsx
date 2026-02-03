@@ -46,10 +46,10 @@ const getParts = (dateLike, timeZone) => {
   const parts = new Intl.DateTimeFormat("en", {
     timeZone,
     year: "numeric",
-    month: "2-digits",
-    day: "2-digits",
-    hour: "2-digits",
-    minute: "2-digits",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
     hour12: true,
   }).formatToParts(dt);
 
@@ -65,15 +65,14 @@ const pad = (n) => String(n).padStart(2, "0");
 
 const formatDateKey = (dateLike, timeZone = "Asia/Colombo") => {
   const p = getParts(dateLike, timeZone);
-  // return `${p.year}-${p.month}-${p.day}`;
-  return `${p.year}-${pad(p.month)}-${pad(p.day)}`;
+  return `${p.year}-${p.month}-${p.day}`;
 };
 
 const formatTimeInTZ = (dateLike, timeZone = "Asia/Colombo") => {
   const p = getParts(dateLike, timeZone);
   const hour = String(Number(p.hour));
   return `${hour}:${p.minute} ${String(
-    p.dayPeriod ?? p.ampm ?? ""
+    p.dayPeriod ?? p.ampm ?? "",
   ).toUpperCase()}`;
 };
 
@@ -99,74 +98,92 @@ const MovieDetailPage = () => {
   const showtimeDays = useMemo(() => {
     if (!movie) return [];
 
+    const TZ = "Asia/Colombo";
     const slotsByDate = {};
+
     (movie.slots || []).forEach((slot) => {
       try {
-        if (!slot || !slot.time) return;
+        let iso = null;
+        let audi = null;
 
-        const { time: iso, audi } = slot;
+        if (!slot) return;
 
-        const dateKey = iso.slice(0, 10);
+        if (typeof slot === "string") {
+          iso = slot;
+        } else if (typeof slot === "object") {
+          iso =
+            slot.time ||
+            slot.datetime ||
+            slot.iso ||
+            slot.date ||
+            slot.datetimeISO ||
+            null;
+
+          audi =
+            slot.audi ||
+            slot.audiName ||
+            slot.auditotium ||
+            slot.auditotiumName ||
+            null;
+        }
+
+        if (!iso) return;
+        const d = new Date(iso);
+        if (Number.isNaN(d.getTime())) return;
+
+        const dateKey = formatDateKey(d, TZ);
         if (!slotsByDate[dateKey]) slotsByDate[dateKey] = [];
         slotsByDate[dateKey].push({ iso, audi });
       } catch (error) {
-        console.error("Error processing slot:", slot, error);
+        console.error("slot parse error:", slot, error);
       }
     });
 
     const dateKeys = Object.keys(slotsByDate).sort();
 
-    const days = dateKeys
-      .map((key) => {
-        try {
-          const rawSlots = slotsByDate[key] || [];
-          const showtimes = rawSlots
-            .map(({ iso, audi }) => {
-              const d = new Date(iso);
-              if (Number.isNaN(d.getTime())) return null;
+    const days = dateKeys.map((key) => {
+      const [yy, mm, dd] = key.split("-").map(Number);
+      const asDate = new Date(Date.UTC(yy, mm - 1, dd));
+      const dayName = new Intl.DateTimeFormat("en-US", {
+        weekday: "long",
+        timeZone: TZ,
+      }).format(asDate);
+      const shortDay = new Intl.DateTimeFormat("en-US", {
+        weekday: "short",
+        timeZone: TZ,
+      }).format(asDate);
+      const dateStr = new Intl.DateTimeFormat("en-US", {
+        weekday: "short",
+        day: "numeric",
+        timeZone: TZ,
+      }).format(asDate);
 
-              const hour = d.getHours();
-              const minute = String(d.getMinutes()).padStart(2, "0");
-              const ampm = hour >= 12 ? "PM" : "AM";
-              const displayHour = hour % 12 || 12;
+      const rawSlots = slotsByDate[key] || [];
 
-              return {
-                time: `${displayHour}:${minute} ${ampm}`,
-                datetime: iso,
-                timestamp: d.getTime(),
-                audi,
-              };
-            })
-            .filter(Boolean);
-
-          const asDate = new Date(key);
-          const dayName = asDate.toLocaleDateString("en-US", {
-            weekday: "long",
-            timeZone: "Asia/Colombo",
-          });
-          const shortDay = asDate.toLocaleDateString("en-US", {
-            weekday: "short",
-            timeZone: "Asia/Colombo",
-          });
-          const dateStr = asDate.toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            timeZone: "Asia/Colombo",
-          });
-
+      const showtimes = rawSlots
+        .map(({ iso, audi }) => {
+          const d = new Date(iso);
+          if (Number.isNaN(d.getTime())) return null;
+          const timeLabel = formatTimeInTZ(iso, TZ);
           return {
-            date: key,
-            dayName,
-            shortDay,
-            dateStr,
-            showtimes,
+            time: timeLabel,
+            datetime: iso,
+            timestamp: d.getTime(),
+            audi: audi ?? null,
           };
-        } catch (error) {
-          console.error("Error processing dateKey:", key, error);
-          return null;
-        }
-      })
-      .filter(Boolean);
+        })
+        .filter(Boolean)
+        .sort((a, b) => a.timestamp - b.timestamp)
+        .map(({ time, datetime, audi }) => ({ time, datetime, audi }));
+
+      return {
+        date: key,
+        dayName,
+        shortDay,
+        dateStr,
+        showtimes,
+      };
+    });
 
     return days;
   }, [movie]);
@@ -378,7 +395,7 @@ const MovieDetailPage = () => {
                           ? "All seats booked for this showtime"
                           : `Seats available: ${Math.max(
                               0,
-                              TOTAL_SEATS - bookedCount
+                              TOTAL_SEATS - bookedCount,
                             )}`
                       }
                       aria-disabled={isSoldOut}
@@ -475,8 +492,8 @@ const MovieDetailPage = () => {
                 const directors = Array.isArray(movie.director)
                   ? movie.director
                   : movie.director
-                  ? [movie.director]
-                  : [];
+                    ? [movie.director]
+                    : [];
 
                 return (
                   <div className="flex gap-4 sm:gap-6 items-start justify-center">
