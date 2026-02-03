@@ -1,0 +1,30 @@
+/* CineGo / Client / src / pages / MovieDetailPageHome / MovieDetailPageHome.css */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+@media (max-width: 420px) {
+  h1 {
+    line-height: 1.05;
+    font-size: 1.25rem;
+  }
+}
+
+.movie-title {
+  font-family: "Cinzel", "Times New Roman", serif;
+  text-shadow: 0 4px 20px rgba(168, 85, 247, 0.75);
+  letter-spacing: 0.08em;
+}
+
+.movie-poster {
+  max-width: 320px;
+}
+
+.cinzel-title {
+  font-family: "Cinzel", serif;
+}
