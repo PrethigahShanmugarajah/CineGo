@@ -155,7 +155,7 @@ const Footer = () => {
             </h3>
             <ul className="space-y-3 sm:space-y-4">
               {genreLinks.map((link) => (
-                <li key={link.href}>
+                <li key={`${link.href}-${link.label}`}>
                   <a
                     href={link.href}
                     className="text-gray-500 hover:text-purple-500 transition-all duration-300 flex items-center group transform hover:translate-x-2 text-sm sm:text-base"
@@ -229,7 +229,7 @@ const Footer = () => {
                 >
                   {item}
                 </a>
-              )
+              ),
             )}
           </div>
         </div>
