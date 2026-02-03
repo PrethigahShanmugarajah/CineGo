@@ -9,8 +9,6 @@ const Movies = () => {
 
   return (
     <section className={moviesStyles.container}>
-      <style>{`@import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap")`}</style>
-
       <h2
         style={{ fontFamily: "'Dancing Script','cursive'" }}
         className="text-3xl sm:text-4xl md:text-5xl text-center mb-8"
@@ -22,7 +20,7 @@ const Movies = () => {
         {visibleMovies.map((m) => (
           <article key={m.id} className="flex flex-col items-center group">
             <Link
-              to={`/movies/${m.id}`}
+              to={`/movie/${m.id}`}
               className="flex flex-col items-center group"
             >
               <img
