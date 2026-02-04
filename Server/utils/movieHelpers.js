@@ -108,7 +108,7 @@ export const enrichLatestTrailerForOutput = (lt = {}) => {
 
   copy.directors = (copy.directors || []).map(mapPerson);
   copy.producers = (copy.producers || []).map(mapPerson);
-  copy.singers = (copy.singers || []).map(mapPerson);
+  copy.signers = (copy.signers || []).map(mapPerson);
   return copy;
 };
 
@@ -140,7 +140,7 @@ export const normalizeItemForOutput = (it = {}) => {
   if (it.latestTrailer)
     obj.latestTrailer = enrichLatestTrailerForOutput(it.latestTrailer);
 
-  obj.auditotium = it.auditotium || null;
+  obj.auditorium = it.auditorium || null;
 
   return obj;
 };
