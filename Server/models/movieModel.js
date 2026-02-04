@@ -35,7 +35,7 @@ const latestTrailerSchema = new mongoose.Schema(
 
     directors: [personSchema],
     producers: [personSchema],
-    signers: [personSchema],
+    singers: [personSchema],
   },
   { _id: false },
 );
