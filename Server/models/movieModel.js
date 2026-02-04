@@ -7,7 +7,7 @@ const personSchema = new mongoose.Schema(
     role: { type: String, trim: true, default: "" },
     file: { type: String, trim: true, default: null },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const slotSchema = new mongoose.Schema(
@@ -16,7 +16,7 @@ const slotSchema = new mongoose.Schema(
     time: { type: String, default: "" },
     ampm: { type: String, enum: ["AM", "PM"], default: "AM" },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const latestTrailerSchema = new mongoose.Schema(
@@ -37,7 +37,7 @@ const latestTrailerSchema = new mongoose.Schema(
     producers: [personSchema],
     signers: [personSchema],
   },
-  { _id: false }
+  { _id: false },
 );
 
 const movieSchema = new mongoose.Schema(
@@ -66,8 +66,9 @@ const movieSchema = new mongoose.Schema(
     directors: [personSchema],
     producers: [personSchema],
     story: { type: String, trim: true },
+    latestTrailer: latestTrailerSchema,
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Movie = mongoose.models.movie || mongoose.model("Movie", movieSchema);
