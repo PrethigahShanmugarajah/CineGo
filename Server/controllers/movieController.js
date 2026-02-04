@@ -7,6 +7,7 @@ import {
   getUploadUrl,
   normalizeItemForOutput,
   safeParseJSON,
+  tryUnlinkUploadUrl,
 } from "../utils/movieHelpers.js";
 
 /* -------- Create a Movie -------- */
@@ -257,6 +258,58 @@ export const getMovieById = async (req, res) => {
           ? "Invalid movie ID."
           : "Failed to fetch the movie.",
       error: `Get a Movie Error: ${error.message}`,
+    });
+  }
+};
+
+/* -------- Delete a Movie -------- */
+export const deleteMovie = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Movie ID is required." });
+    }
+
+    const m = await Movie.findById(id).lean();
+    if (!m) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Movie not found." });
+    }
+
+    if (m.poster) tryUnlinkUploadUrl(m.poster);
+    if (m.latestTrailer && m.latestTrailer.thumbnail)
+      tryUnlinkUploadUrl(m.latestTrailer.thumbnail);
+
+    [m.cast || [], m.directors || [], m.producers || []].forEach((arr) =>
+      arr.forEach((p) => {
+        if (p && p.file) tryUnlinkUploadUrl(p.file);
+      }),
+    );
+
+    if (m.latestTrailer) {
+      [
+        ...(m.latestTrailer.directors || []),
+        ...(m.latestTrailer.producers || []),
+        ...(m.latestTrailer.singers || []),
+      ].forEach((p) => {
+        if (p && p.file) tryUnlinkUploadUrl(p.file);
+      });
+    }
+
+    await Movie.findByIdAndDelete(id);
+    return res
+      .status(200)
+      .json({ success: true, message: "Movie deleted successfully!" });
+  } catch (error) {
+    console.error("Delete a Movie Error:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete the movie.",
+      error: `Delete a Movie Error: ${error.message}`,
     });
   }
 };
