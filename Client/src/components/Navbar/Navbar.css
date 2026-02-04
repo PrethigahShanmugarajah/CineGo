@@ -10,8 +10,8 @@
   pointer-events: none;
   background: linear-gradient(
     90deg,
-    rgba(168, 85, 247, 0.18),
-    rgba(126, 34, 206, 0.08)
+    rgba(168, 85, 247, 0.14),
+    rgba(126, 34, 206, 0.06)
   );
   transform: scaleX(0);
   transform-origin: left center;
