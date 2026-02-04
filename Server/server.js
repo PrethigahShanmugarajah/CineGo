@@ -4,6 +4,7 @@ import "dotenv/config";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import userRouter from "./routes/userRoutes.js";
+import movieRouter from "./routes/movieRoutes.js";
 
 /* -------- INITIALIZE EXPRESS -------- */
 const app = express();
@@ -19,6 +20,7 @@ app.use(express.urlencoded({ extend: true }));
 /* -------- ROUTES -------- */
 app.get("/", (req, res) => res.send("API is Working!"));
 app.use("/api/user", userRouter);
+app.use("/api/movie", movieRouter);
 
 /* -------- PORT -------- */
 const port = process.env.PORT || 5000;
