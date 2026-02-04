@@ -171,12 +171,8 @@ export const getMovies = async (req, res) => {
     if (latestTrailer && String(latestTrailer).toLowerCase() !== "false") {
       filter =
         Object.keys(filter).length === 0
-          ? {
-              type: "latestTrailers",
-            }
-          : {
-              $and: [filter, { type: "latestTrailers" }],
-            };
+          ? { type: "latestTrailers" }
+          : { $and: [filter, { type: "latestTrailers" }] };
     }
 
     const pg = Math.max(1, parseInt(page, 10) || 1);
@@ -184,6 +180,18 @@ export const getMovies = async (req, res) => {
     const skip = (pg - 1) * lim;
 
     const total = await Movie.countDocuments(filter);
+
+    if (total === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No movies found.",
+        total: 0,
+        page: pg,
+        limit: lim,
+        items: [],
+      });
+    }
+
     const items = await Movie.find(filter)
       .sort(sort)
       .skip(skip)
@@ -300,9 +308,10 @@ export const deleteMovie = async (req, res) => {
     }
 
     await Movie.findByIdAndDelete(id);
-    return res
-      .status(200)
-      .json({ success: true, message: "Movie deleted successfully!" });
+    return res.status(200).json({
+      success: true,
+      message: `${m.movieName} movie deleted successfully!`,
+    });
   } catch (error) {
     console.error("Delete a Movie Error:", error.message);
 
