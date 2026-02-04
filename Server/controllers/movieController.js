@@ -5,6 +5,7 @@ import {
   buildLatestTrailerPeople,
   extractFilenameFromUrl,
   getUploadUrl,
+  normalizeItemForOutput,
   safeParseJSON,
 } from "../utils/movieHelpers.js";
 
@@ -123,13 +124,11 @@ export const createMovie = async (req, res) => {
     });
 
     const savedMovie = await doc.save();
-    return res
-      .status(201)
-      .json({
-        success: true,
-        message: "Movie created successfully!",
-        data: savedMovie,
-      });
+    return res.status(201).json({
+      success: true,
+      message: "Movie created successfully!",
+      data: savedMovie,
+    });
   } catch (error) {
     console.error("Create a Movie Error:", error.message);
 
@@ -137,6 +136,75 @@ export const createMovie = async (req, res) => {
       success: false,
       message: "Failed to create a movie.",
       error: `Create a Movie Error: ${error.message}`,
+    });
+  }
+};
+
+/* -------- Get All Movies -------- */
+export const getMovies = async (req, res) => {
+  try {
+    const {
+      category,
+      type,
+      sort = "-createdAt",
+      page = 1,
+      limit = 12,
+      search,
+      latestTrailer,
+    } = req.query;
+
+    let filter = {};
+
+    if (typeof category === "string" && category.trim())
+      filter.categories = { $in: [category.trim()] };
+    if (typeof type === "string" && type.trim()) filter.type = type.trim();
+    if (typeof search === "string" && search.trim()) {
+      const q = search.trim();
+      filter.$or = [
+        { movieName: { $regex: q, $options: "i" } },
+        { "latestTrailer.title": { $regex: q, $options: "i" } },
+        { story: { $regex: q, $options: "i" } },
+      ];
+    }
+
+    if (latestTrailer && String(latestTrailer).toLowerCase() !== "false") {
+      filter =
+        Object.keys(filter).length === 0
+          ? {
+              type: "latestTrailers",
+            }
+          : {
+              $and: [filter, { type: "latestTrailers" }],
+            };
+    }
+
+    const pg = Math.max(1, parseInt(page, 10) || 1);
+    const lim = Math.min(200, parseInt(limit, 10) || 12);
+    const skip = (pg - 1) * lim;
+
+    const total = await Movie.countDocuments(filter);
+    const items = await Movie.find(filter)
+      .sort(sort)
+      .skip(skip)
+      .limit(lim)
+      .lean();
+
+    const normalized = (items || []).map(normalizeItemForOutput);
+    return res.json({
+      success: true,
+      message: "Movies fetched successfully!",
+      total,
+      page: pg,
+      limit: lim,
+      items: normalized,
+    });
+  } catch (error) {
+    console.error("Get All Movies Error:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch movies.",
+      error: `Get All Movies Error: ${error.message}`,
     });
   }
 };
