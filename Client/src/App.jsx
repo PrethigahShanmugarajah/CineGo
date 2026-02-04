@@ -1,4 +1,5 @@
 // CineGo / Client / src / App.jsx
+import { useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
 import Home from "./pages/Home";
@@ -15,6 +16,43 @@ import MovieDetailPage from "./pages/MovieDetailPage/MovieDetailPage";
 import MovieDetailPageHome from "./pages/MovieDetailPageHome/MovieDetailPageHome";
 import SeatSelector from "./pages/SeatSelector/SeatSelector";
 import SeatSelectorHome from "./pages/SeatSelectorHome/SeatSelectorHome";
+
+function ScrollToTop() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (typeof window == "undefined" && "scrollRestoration" in window.history) {
+      try {
+        window.history.scrollRestoration = "manual";
+      } catch (error) {}
+    }
+  }, []);
+
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace("#", "");
+      const el =
+        document.getElementById(id) || document.querySelector(location.hash);
+
+      if (el) {
+        el.scrollIntoView({
+          behavior: "auto",
+          block: "start",
+          inline: "nearest",
+        });
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        return;
+      }
+    }
+
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }, [location.pathname, location.search, location.hash]);
+
+  return null;
+}
 
 const App = () => {
   const location = useLocation();
@@ -34,6 +72,8 @@ const App = () => {
 
   return (
     <>
+      <ScrollToTop />
+
       <ToastContainer theme="dark" style={{ zIndex: 9999 }} />
       <div className="min-h-screen w-full overflow-x-hidden">
         {!hideNavbar && <Navbar />}
