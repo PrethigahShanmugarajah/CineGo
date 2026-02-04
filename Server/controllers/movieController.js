@@ -208,3 +208,55 @@ export const getMovies = async (req, res) => {
     });
   }
 };
+
+/* -------- Get a Movie -------- */
+export const getMovieById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Movie ID is required." });
+    }
+
+    const item = await Movie.findById(id).lean();
+    if (!item) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Movie not found." });
+    }
+
+    const objmov = normalizeItemForOutput(item);
+
+    if (item.type === "latestTrailers" && item.latestTrailer) {
+      const lt = item.latestTrailer;
+      objmov.genres = objmov.genres || lt.genres || [];
+      objmov.year = objmov.year || lt.year || null;
+      objmov.rating = objmov.rating || lt.rating || null;
+      objmov.duration = objmov.duration || lt.duration || null;
+      objmov.description =
+        objmov.description ||
+        lt.description ||
+        lt.excerpt ||
+        objmov.description ||
+        "";
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Movie fetched successfully!",
+      item: objmov,
+    });
+  } catch (error) {
+    console.error("Get a Movie Error:", error.message);
+
+    return res.status(error?.name === "CastError" ? 400 : 500).json({
+      success: false,
+      message:
+        error?.name === "CastError"
+          ? "Invalid movie ID."
+          : "Failed to fetch the movie.",
+      error: `Get a Movie Error: ${error.message}`,
+    });
+  }
+};
