@@ -108,7 +108,7 @@ export const enrichLatestTrailerForOutput = (lt = {}) => {
 
   copy.directors = (copy.directors || []).map(mapPerson);
   copy.producers = (copy.producers || []).map(mapPerson);
-  copy.signers = (copy.signers || []).map(mapPerson);
+  copy.singers = (copy.singers || []).map(mapPerson);
   return copy;
 };
 
