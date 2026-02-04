@@ -2,7 +2,7 @@
 import express from "express";
 import multer from "multer";
 import path from "path";
-import { createMovie } from "../controllers/movieController.js";
+import { createMovie, getMovies } from "../controllers/movieController.js";
 
 const movieRouter = express.Router();
 
@@ -31,5 +31,6 @@ const upload = multer({ storage }).fields([
 ]);
 
 movieRouter.post("/movie-create", upload, createMovie);
+movieRouter.get("/movies-get", getMovies);
 
 export default movieRouter;
