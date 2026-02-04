@@ -4,6 +4,7 @@ import multer from "multer";
 import path from "path";
 import {
   createMovie,
+  deleteMovie,
   getMovieById,
   getMovies,
 } from "../controllers/movieController.js";
@@ -37,5 +38,6 @@ const upload = multer({ storage }).fields([
 movieRouter.post("/movie-create", upload, createMovie);
 movieRouter.get("/movies-get", getMovies);
 movieRouter.get("/movie-get/:id", getMovieById);
+movieRouter.delete("/movie-delete/:id", deleteMovie);
 
 export default movieRouter;
