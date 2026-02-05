@@ -1,10 +1,10 @@
 // CineGo / Admin / src / pages / Home.jsx
-import AddPage from "../components/AddPage";
+import DashboardPage from "../components/DashboardPage";
 
 const Home = () => {
   return (
     <div>
-      <AddPage />
+      <DashboardPage />
     </div>
   );
 };
