@@ -36,7 +36,7 @@ export const createMovie = async (req, res) => {
     const slots = safeParseJSON(body.slots) || [];
     const seatPrices = safeParseJSON(body.seatPrices) || {
       standard: Number(body.standard || 0),
-      recliner: Number(body, recliner || 0),
+      recliner: Number(body.recliner || 0),
     };
 
     const cast = safeParseJSON(body.cast) || [];
@@ -85,9 +85,13 @@ export const createMovie = async (req, res) => {
       });
     };
 
-    attachLFiles("ltDirectorFiles", "directors");
-    attachLFiles("ltProducerFiles", "producers");
-    attachLFiles("ltSingerFiles", "singers");
+    // attachLFiles("ltDirectorFiles", "directors");
+    // attachLFiles("ltProducerFiles", "producers");
+    // attachLFiles("ltSingerFiles", "singers");
+
+    attachLFiles("ltDirectorImages", "directors");
+    attachLFiles("ltProducerImages", "producers");
+    attachLFiles("ltSingerImages", "singers");
 
     latestTrailerBody.directors = buildLatestTrailerPeople(
       latestTrailerBody.directors,
