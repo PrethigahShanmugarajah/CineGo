@@ -323,18 +323,26 @@ export const getBooking = async (req, res) => {
       });
     }
 
-    const userId = String(req.user._id || req.user.id);
+    // const userId = String(req.user._id || req.user.id);
     const { paymentStatus, status } = req.query;
 
-    const q = { userId };
+    // const q = { userId };
+    const userId = req.user._id || req.user.id;
+
+    const q = {
+      userId: mongoose.Types.ObjectId.isValid(String(userId))
+        ? new mongoose.Types.ObjectId(String(userId))
+        : userId,
+    };
 
     if (paymentStatus && String(paymentStatus).toLowerCase() !== "all") {
       q.paymentStatus = String(paymentStatus).toLowerCase();
     } else if (status && String(status).toLowerCase() !== "all") {
       q.status = String(status).toLowerCase();
-    } else {
-      q.paymentStatus = "paid";
     }
+    // else {
+    //   q.paymentStatus = "paid";
+    // }
 
     const items = await Booking.find(q).sort({ createdAt: -1 }).lean().exec();
 
@@ -394,9 +402,10 @@ export const listBookings = async (req, res) => {
       q.paymentStatus = String(paymentStatus).toLowerCase();
     } else if (status && String(status).toLowerCase() !== "all") {
       q.status = String(status).toLowerCase();
-    } else {
-      q.paymentStatus = "paid";
     }
+    // else {
+    //   q.paymentStatus = "paid";
+    // }
 
     const pg = Math.max(1, Number(page) || 1);
     const lim = Math.min(1000, Number(limit) || 100);
