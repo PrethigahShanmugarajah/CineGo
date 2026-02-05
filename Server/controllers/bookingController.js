@@ -312,3 +312,68 @@ export const createBooking = async (req, res) => {
     });
   }
 };
+
+/* -------- Get All Bookings -------- */
+export const getBooking = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required to fetch bookings.",
+      });
+    }
+
+    const userId = String(req.user._id || req.user.id);
+    const { paymentStatus, status } = req.query;
+
+    const q = { userId };
+
+    if (paymentStatus && String(paymentStatus).toLowerCase() !== "all") {
+      q.paymentStatus = String(paymentStatus).toLowerCase();
+    } else if (status && String(status).toLowerCase() !== "all") {
+      q.status = String(status).toLowerCase();
+    } else {
+      q.paymentStatus = "paid";
+    }
+
+    const items = await Booking.find(q).sort({ createdAt: -1 }).lean().exec();
+
+    // if (!items || items.length === 0) {
+    //   return res.status(200).json({
+    //     success: true,
+    //     message: "No bookings found.",
+    //     items: [],
+    //   });
+    // }
+
+    if (!items) {
+      return res.status(200).json({
+        success: true,
+        message: "No bookings found.",
+        items: [],
+      });
+    }
+
+    if (items.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No bookings found.",
+        items: [],
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Bookings fetched successfully!",
+      items,
+    });
+  } catch (error) {
+    console.error("Get All Bookings Error:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch bookings.",
+      error: `Get All Bookings Error: ${error.message}`,
+    });
+  }
+};
