@@ -242,7 +242,7 @@ const Navbar = () => {
             {/* -------- Footer -------- */}
             <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-purple-800">
               <p className="text-base text-purple-300">
-                &copy; {new Date().getFullYear} CineGo
+                &copy; {new Date().getFullYear()} CineGo
               </p>
             </div>
           </aside>
