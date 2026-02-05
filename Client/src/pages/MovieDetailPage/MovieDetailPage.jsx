@@ -122,8 +122,8 @@ const MovieDetailPage = () => {
           audi =
             slot.audi ||
             slot.audiName ||
-            slot.auditotium ||
-            slot.auditotiumName ||
+            slot.auditorium ||
+            slot.auditoriumName ||
             null;
         }
 
