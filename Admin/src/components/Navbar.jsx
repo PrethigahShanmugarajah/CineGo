@@ -130,7 +130,7 @@ const Navbar = () => {
             <div className="flex items-center justify-between px-4 py-4 border-b border-purple-800">
               <div className="flex items-center space-x-3">
                 <div className="flex items-center justify-center w-10 h-10 bg-purple-600 rounded-full transform rotate-12">
-                  <Film className="w-6 h-6 text-white transform -rotate-12" />
+                  <Theater className="w-6 h-6 text-white transform -rotate-12" />
                 </div>
 
                 <span className="font-['Impact'] text-xl text-white tracking-wider">
