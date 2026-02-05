@@ -488,3 +488,90 @@ export const deleteBooking = async (req, res) => {
     });
   }
 };
+
+/* -------- Get Occupied Seats -------- */
+export const getOccupiedSeats = async (req, res) => {
+  try {
+    const {
+      movieId,
+      movieName,
+      showtime: showtimeRaw,
+      audi: audiRaw,
+    } = req.query;
+
+    if (!showtimeRaw) {
+      return res.status(400).json({
+        success: false,
+        message: "Showtime query parameter is required.",
+      });
+    }
+
+    const auditorium = String(audiRaw || req.query.auditorium || "Audi 1");
+    let parsed;
+    try {
+      parsed = normalizeShowtimeToMinute(showtimeRaw);
+    } catch (error) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid showtime.",
+      });
+    }
+
+    const start = new Date(parsed);
+    const end = new Date(start.getTime() + 60 * 1000);
+    const q = {
+      showtime: { $gte: start, $lt: end },
+      auditorium,
+      status: { $in: BLOCKING_STATUSES },
+    };
+    const movieClauses = buildMovieMatchClause(movieId, movieName);
+
+    if (movieClauses.length > 0) q.$or = movieClauses;
+
+    if (!Booking) {
+      console.error("Booking model undefined.");
+      return res.status(500).json({
+        success: false,
+        message: "Server misconfiguration (Booking model).",
+      });
+    }
+
+    const docs = await Booking.find(q, { seats: 1 }).lean().exec();
+    const occupiedSet = new Set();
+
+    for (const d of docs || []) {
+      const sarr = Array.isArray(d.seats) ? d.seats : [];
+      for (const s of sarr) {
+        if (!s) continue;
+        let seatId = "";
+        if (typeof s === "string") seatId = s.trim().toUpperCase();
+        else if (s.seatId) seatId = String(s.seatId).trim().toUpperCase();
+        else if (s.id) seatId = String(s.id).trim().toUpperCase();
+        else if (s.number) seatId = String(s.number).trim().toUpperCase();
+        if (seatId) occupiedSet.add(seatId);
+      }
+    }
+
+    if (occupiedSet.size === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No occupied seats found.",
+        occupied: [],
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Occupied seats fetched successfully!",
+      occupied: [...occupiedSet],
+    });
+  } catch (error) {
+    console.error("Get Occupied Seats Error:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to get occupied seats.",
+      error: `Get Occupied Seats Error: ${error.message}`,
+    });
+  }
+};
