@@ -1,6 +1,7 @@
 // CineGo / Server / routes / bookingRoutes.js
 import express from "express";
 import {
+  confirmPayment,
   createBooking,
   deleteBooking,
   getBooking,
@@ -16,5 +17,6 @@ bookingRouter.get("/booking-get", authMiddleware, getBooking);
 bookingRouter.get("/booking-list", listBookings);
 bookingRouter.delete("/booking-delete/:id", deleteBooking);
 bookingRouter.get("/booking-get-occupied", getOccupiedSeats);
+bookingRouter.get("/booking-confirm-payment", confirmPayment);
 
 export default bookingRouter;
