@@ -1,9 +1,10 @@
 // CineGo / Admin / src / pages / ListMovies.jsx
+import ListMoviesPage from "../components/ListMoviesPage";
 
 const ListMovies = () => {
   return (
     <div>
-      <h1>ListMovies</h1>
+      <ListMoviesPage />
     </div>
   );
 };
