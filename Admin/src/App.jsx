@@ -4,18 +4,18 @@ import { ToastContainer } from "react-toastify";
 import Home from "./pages/Home";
 import ListMovies from "./pages/ListMovies";
 import Navbar from "./components/Navbar";
-import Dashboard from "./pages/Dashboard";
 import Bookings from "./pages/Bookings";
+import AddMovie from "./pages/AddMovie";
 
 const App = () => {
   return (
     <>
-      <ToastContainer />
+      <ToastContainer theme="dark" style={{ zIndex: 9999 }} />
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/listmovies" element={<ListMovies />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/addmovies" element={<AddMovie />} />
         <Route path="/bookings" element={<Bookings />} />
       </Routes>
     </>
