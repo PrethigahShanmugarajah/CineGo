@@ -438,3 +438,53 @@ export const listBookings = async (req, res) => {
     });
   }
 };
+
+/* -------- Delete Booking -------- */
+export const deleteBooking = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "Invalid ID.",
+    //   });
+    // }
+
+    if (!id) {
+      return res.status(400).json({
+        success: false,
+        message: "Booking ID is required.",
+      });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid booking ID.",
+      });
+    }
+
+    const b = await Booking.findByIdAndDelete(id).lean().exec();
+
+    if (!b) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Booking deleted successfully!",
+    });
+  } catch (error) {
+    console.error("Delete Booking Error:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete the booking.",
+      error: `Delete Booking Error: ${error.message}`,
+    });
+  }
+};
