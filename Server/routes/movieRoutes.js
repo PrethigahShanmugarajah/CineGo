@@ -18,7 +18,8 @@ const storage = multer.diskStorage({
   filename: (req, file, cb) => {
     const unique = Date.now() + "-" + Math.round(Math.random() * 1e5);
     const ext = path.extname(file.originalname);
-    cb(null, `movie-${unique}${ext}}`);
+    // cb(null, `movie-${unique}${ext}}`);
+    cb(null, `movie-${unique}${ext}`);
   },
 });
 
@@ -29,9 +30,13 @@ const upload = multer({ storage }).fields([
   { name: "ltThumbnail", maxCount: 1 },
   { name: "castFiles", maxCount: 20 },
   { name: "directorFiles", maxCount: 20 },
-  { name: "producerFiles", maxCount: 20 },
-  { name: "ltDirectorFiles", maxCount: 20 },
-  { name: "ltProducerFiles", maxCount: 20 },
+  // { name: "producerFiles", maxCount: 20 },
+  // { name: "ltDirectorFiles", maxCount: 20 },
+  // { name: "ltProducerFiles", maxCount: 20 },
+  { name: "ltDirectorImages", maxCount: 20 },
+  { name: "ltProducerImages", maxCount: 20 },
+  { name: "ltSingerImages", maxCount: 20 },
+
   { name: "ltSingerFiles", maxCount: 20 },
 ]);
 
