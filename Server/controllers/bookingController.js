@@ -377,3 +377,64 @@ export const getBooking = async (req, res) => {
     });
   }
 };
+
+/* -------- List Bookings -------- */
+export const listBookings = async (req, res) => {
+  try {
+    const { movieId, page = 1, limit = 100, paymentStatus, status } = req.query;
+    const q = {};
+
+    if (movieId) {
+      if (mongoose.Types.ObjectId.isValid(String(movieId)))
+        q.movieId = new mongoose.Types.ObjectId(String(movieId));
+      else q.movieName = String(movieId);
+    }
+
+    if (paymentStatus && String(paymentStatus).toLowerCase() !== "all") {
+      q.paymentStatus = String(paymentStatus).toLowerCase();
+    } else if (status && String(status).toLowerCase() !== "all") {
+      q.status = String(status).toLowerCase();
+    } else {
+      q.paymentStatus = "paid";
+    }
+
+    const pg = Math.max(1, Number(page) || 1);
+    const lim = Math.min(1000, Number(limit) || 100);
+    const total = await Booking.countDocuments(q).exec();
+
+    if (total === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "No bookings found.",
+        total: 0,
+        page: pg,
+        limit: lim,
+        items: [],
+      });
+    }
+
+    const items = await Booking.find(q)
+      .sort({ createdAt: -1 })
+      .skip((pg - 1) * lim)
+      .limit(lim)
+      .lean()
+      .exec();
+
+    return res.status(200).json({
+      success: true,
+      message: "Bookings fetched successfully!",
+      total,
+      page: pg,
+      limit: lim,
+      items,
+    });
+  } catch (error) {
+    console.error("List Bookings Error:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch bookings.",
+      error: `List Bookings Error: ${error.message}`,
+    });
+  }
+};
