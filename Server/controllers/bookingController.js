@@ -575,3 +575,95 @@ export const getOccupiedSeats = async (req, res) => {
     });
   }
 };
+
+/* -------- Confirm Payment -------- */
+export const confirmPayment = async (req, res) => {
+  try {
+    const { session_id } = req.query;
+    if (!session_id) {
+      return res.status(400).json({
+        success: false,
+        message: "session_id is required.",
+      });
+    }
+
+    let stripe;
+    try {
+      stripe = getStripeOrThrow();
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: "Payment is not configured.",
+        error: error.message,
+      });
+    }
+
+    const sessionObj = await stripe.checkout.sessions.retrieve(session_id);
+    if (!sessionObj) {
+      return res.status(404).json({
+        success: false,
+        message: "Failed to find the session.",
+      });
+    }
+
+    if (sessionObj.payment_status !== "paid") {
+      return res.status(400).json({
+        success: false,
+        message: "Payment is not completed.",
+      });
+    }
+
+    const bookingId = sessionObj.metadata?.bookingId;
+    // if (!bookingId || !mongoose.Types.ObjectId.isValid(bookingId)) {
+    //   return res.status(400).json({
+    //     success: false,
+    //     message: "Invalid bookingId in session metadata.",
+    //   });
+    // }
+
+    if (!bookingId) {
+      return res.status(400).json({
+        success: false,
+        message: "bookingId is missing in session metadata.",
+      });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(bookingId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid bookingId in session metadata.",
+      });
+    }
+
+    const booking = await Booking.findByIdAndUpdate(
+      bookingId,
+      {
+        paymentStatus: "paid",
+        status: "confirmed",
+        paymentIntentId: sessionObj.payment_intent || "",
+      },
+      { new: true },
+    ).exec();
+
+    if (!booking) {
+      return res.status(404).json({
+        success: false,
+        message: "Booking not found for this session.",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Payment confirmed successfully!",
+      booking,
+    });
+  } catch (error) {
+    console.error("Confirm Payment Error:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to confirm payment.",
+      error: `Confirm Payment Error: ${error.message}`,
+    });
+  }
+};
