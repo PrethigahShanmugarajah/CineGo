@@ -1,4 +1,4 @@
-/* CineGo / Client / src / index.css */
+/* CineGo / Admin / src / index.css */
 @import url("https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap");
 
 @import "tailwindcss";
@@ -13,11 +13,11 @@ button {
 
 .Toastify__toast {
   font-family: "Inria Serif", serif;
-  color: #000000;
+  color: #ffffff;
 }
 
 .Toastify__close-button {
-  color: #000000;
+  color: #ffffff;
   opacity: 1;
 }
 
