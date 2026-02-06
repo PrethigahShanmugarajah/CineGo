@@ -1,5 +1,5 @@
 // CineGo / Admin / src / pages / AddMovie.jsx
-import AddMoviePage from "../components/AddMoviePage";
+import AddMoviePage from "../components/AddMoviePage/AddMoviePage";
 
 const AddMovie = () => {
   return (
