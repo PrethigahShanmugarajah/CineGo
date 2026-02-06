@@ -1,0 +1,42 @@
+/* CineGo / Admin / src / components / ListMoviesPage / ListMoviesPage.css */
+@import url("https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap");
+
+.card-hover {
+  transition: all 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 50px -12px rgba(147, 51, 234, 0.25);
+}
+
+.filter-btn {
+  transition: all 0.18s ease-in-out;
+}
+
+.gradient-border {
+  background: linear-gradient(
+    135deg,
+    rgba(147, 51, 234, 0.06),
+    rgba(168, 85, 247, 0.02)
+  );
+  border: 1px solid rgba(147, 51, 234, 0.08);
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: rgba(75, 85, 99, 0.18);
+  border-radius: 10px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(147, 51, 234, 0.35);
+  border-radius: 10px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(147, 51, 234, 0.5);
+}
