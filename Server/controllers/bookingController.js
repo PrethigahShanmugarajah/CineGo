@@ -339,10 +339,9 @@ export const getBooking = async (req, res) => {
       q.paymentStatus = String(paymentStatus).toLowerCase();
     } else if (status && String(status).toLowerCase() !== "all") {
       q.status = String(status).toLowerCase();
+    } else {
+      q.paymentStatus = "paid";
     }
-    // else {
-    //   q.paymentStatus = "paid";
-    // }
 
     const items = await Booking.find(q).sort({ createdAt: -1 }).lean().exec();
 
@@ -402,10 +401,9 @@ export const listBookings = async (req, res) => {
       q.paymentStatus = String(paymentStatus).toLowerCase();
     } else if (status && String(status).toLowerCase() !== "all") {
       q.status = String(status).toLowerCase();
+    } else {
+      q.paymentStatus = "paid";
     }
-    // else {
-    //   q.paymentStatus = "paid";
-    // }
 
     const pg = Math.max(1, Number(page) || 1);
     const lim = Math.min(1000, Number(limit) || 100);
