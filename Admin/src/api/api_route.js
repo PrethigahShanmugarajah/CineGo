@@ -10,6 +10,7 @@ const API_ROUTES = {
   },
   BOOKING: {
     BOOKING_LIST: `${BASE_URL}/api/booking/booking-list`,
+    BOOKING_GET: `${BASE_URL}/api/booking/booking-get`,
   },
   USER: {
     USER_GET: `${BASE_URL}/api/user/user-get`,
