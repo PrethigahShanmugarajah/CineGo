@@ -1,8 +1,12 @@
 // CineGo / Client / src / components / LoginPage / LoginPage.jsx
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { ArrowLeft, Eye, EyeOff, Film, Mail, Popcorn } from "lucide-react";
+import { ArrowLeft, Eye, EyeOff, Film, Mail, Theater } from "lucide-react";
 import "./LoginPage.css";
+import api from "../../api/axios";
+import API_ROUTES from "../../api/api_route";
+import { ClipLoader } from "react-spinners";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +16,8 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
@@ -20,49 +26,82 @@ const LoginPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsLoading(true);
     if (!formData.password || formData.password.length < 6) {
       setIsLoading(false);
-      toast.error("Password must be atleast of 6 characters long", {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "dark",
-      });
-      console.warn("Login Blocked");
-      console.log(formData);
+      toast.error("Password must be atleast of 6 characters long");
       return;
     }
 
-    console.log("Login Data:", formData);
+    try {
+      const payload = {
+        email: formData.email.trim(),
+        password: formData.password,
+      };
 
-    setTimeout(() => {
-      setIsLoading(false);
-      try {
-        const authObj = { isLoggedIn: true, email: formData.email };
-        localStorage.setItem("cine_auth", JSON.stringify(authObj));
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userEmail", formData.email || "");
-        localStorage.setItem("cine_user_email", formData.email || "");
-        console.log("Auth saved to localStorage:", authObj);
-      } catch (error) {
-        console.log("Failed to Login:", error);
-        toast.error(error);
+      const response = await api.post(API_ROUTES.USER.USER_LOGIN, payload, {
+        headers: { "Content-Type": `application/json` },
+      });
+
+      console.log("User Login API Response:", response);
+
+      if (response?.data?.success) {
+        toast.success(response?.data?.message);
+        console.log("User Login Success:", response?.data?.message);
+
+        if (response.data.token) {
+          localStorage.setItem("token", response.data.token);
+        }
+
+        try {
+          const userToStore = data.user || { email: formData.email };
+
+          localStorage.setItem(
+            "cinego_auth",
+            JSON.stringify({
+              // isLogged: true,
+              isLoggedIn: true,
+              email: userToStore.email || formData.email,
+            }),
+          );
+
+          localStorage.setItem("isLoggedIn", "true");
+
+          localStorage.setItem(
+            "userEmail",
+            userToStore.email || formData.email || "",
+          );
+
+          localStorage.setItem(
+            "cinego_user_email",
+            userToStore.email || formData.email || "",
+          );
+
+          localStorage.setItem("user", JSON.stringify(userToStore));
+        } catch (error) {
+          console.warn("Failed to persist full user object");
+        }
+
+        // setTimeout(() => {
+        //   window.location.href = "/";
+        // }, 1200);
+
+        navigate("/");
+      } else {
+        toast.warn(response?.data?.message);
+        console.warn("User Login Data Error:", response?.data?.message);
       }
-      toast.success("Login Successfully!");
-      setTimeout(() => {
-        window.location.href = "/";
-      }, 2000);
-    }, 1500);
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error?.message);
+      console.log("User Login Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const goBack = () => {
-    window.history.back();
+    window.location.href = "/";
   };
 
   return (
@@ -165,15 +204,15 @@ const LoginPage = () => {
                 }`}
               >
                 {isLoading ? (
-                  <div className="flex items-center justify-center">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    <span className="font-cinema text-sm sm:text-base">
-                      Signing in...
+                  <div className="flex items-center justify-center gap-3">
+                    <ClipLoader size={18} color="#FFFFFF" />
+                    <span className="text-sm animate-pulse">
+                      Creating Your Account...
                     </span>
                   </div>
                 ) : (
                   <div className="flex items-center justify-center">
-                    <Popcorn size={18} className="mr-2" />
+                    <Theater size={18} className="mr-2" />
                     <span className="font-cinema text-sm sm:text-base">
                       Access Your Account
                     </span>
