@@ -42,13 +42,13 @@ const ContactPage = () => {
     }
 
     const whatsappMessage = `Name": ${encodeURIComponent(
-      formData.name
+      formData.name,
     )}%0AEmail: ${encodeURIComponent(
-      formData.email
+      formData.email,
     )}%0APhone: ${encodeURIComponent(
-      formData.phone
+      formData.phone,
     )}%0ASubject: ${encodeURIComponent(
-      formData.subject
+      formData.subject,
     )}%0AMessage: ${encodeURIComponent(formData.message)}`;
 
     window.open(`https://wa.me/0771234567=${whatsappMessage}`, "_blank");
@@ -299,9 +299,9 @@ const ContactPage = () => {
             </div>
 
             <div className="relative">
-              <div className="absolute -inset-2 bg-linear-to-r from-amber-600 to-amber-800 rounded-2xl blur-lg opacity-50"></div>
-              <div className="relative bg-gray-800 rounded-2xl p-5 shadow-2xl border border-amber-500/30">
-                <h3 className="text-lg font-bold mb-3 text-amber-400 flex items-center">
+              <div className="absolute -inset-2 bg-linear-to-r from-blue-600 to-blue-800 rounded-2xl blur-lg opacity-50"></div>
+              <div className="relative bg-gray-800 rounded-2xl p-5 shadow-2xl border border-blue-500/30">
+                <h3 className="text-lg font-bold mb-3 text-blue-400 flex items-center">
                   <Phone className="h-5 w-5 mr-2" />
                   Lorem ipsum dolor sit.
                 </h3>
@@ -312,10 +312,10 @@ const ContactPage = () => {
                 </p>
 
                 <div className="flex items-center">
-                  <div className="bg-amber-600 text-white text-sm font-bold px-3 py-1 rounded-full">
+                  <div className="bg-blue-600 text-white text-sm font-bold px-3 py-1 rounded-full">
                     Hotline: +94 777654321
                   </div>
-                  <span className="ml-3 text-xs text-amber-400">
+                  <span className="ml-3 text-xs text-blue-400">
                     Available during showtimes
                   </span>
                 </div>
