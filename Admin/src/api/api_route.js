@@ -8,6 +8,12 @@ const API_ROUTES = {
     MOVIE_DELETE: (targetId) =>
       `${BASE_URL}/api/movie/movie-delete/${targetId}`,
   },
+  BOOKING: {
+    BOOKING_LIST: `${BASE_URL}/api/booking/booking-list`,
+  },
+  USER: {
+    USER_GET: `${BASE_URL}/api/user/user-get`,
+  },
 };
 
 export default API_ROUTES;
