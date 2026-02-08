@@ -11,16 +11,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import movies from "../../assets/dummymdata";
 import "./SeatSelectorPage.css";
-
-const ROWS = [
-  { id: "A", type: "standard", count: 8 },
-  { id: "B", type: "standard", count: 8 },
-  { id: "C", type: "standard", count: 8 },
-  { id: "D", type: "recliner", count: 8 },
-  { id: "E", type: "recliner", count: 8 },
-];
-
-const seatId = (r, n) => `${r}${n}`;
+import { ROWS, seatId } from "../../utils/helper";
 
 const SeatSelectorPage = () => {
   const { id, slot } = useParams();
