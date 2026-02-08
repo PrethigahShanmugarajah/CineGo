@@ -11,6 +11,7 @@ import {
   PlayIcon,
   Search,
   Star,
+  Theater,
   Ticket,
   Trash2,
   X,
@@ -377,7 +378,7 @@ const ListMoviesPage = () => {
                 <div className="flex flex-col items-center justify-center text-center py-12 md:py-16">
                   <div className="flex items-center justify-center mb-3 w-full">
                     <div className="p-6 bg-gray-900/30 rounded-3xl border border-gray-700 backdrop-blur-sm">
-                      <Film size={60} className="text-purple-600" />
+                      <Theater size={60} className="text-purple-600" />
                     </div>
                   </div>
 
