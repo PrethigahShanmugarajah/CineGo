@@ -6,6 +6,9 @@ const API_ROUTES = {
     USER_REGISTER: `${BASE_URL}/api/user/user-register`,
     USER_LOGIN: `${BASE_URL}/api/user/user-login`,
   },
+  MOVIE: {
+    MOVIE_GET_RELEASE_SOON: `${BASE_URL}/api/movie/movies-get?type=releaseSoon&limit=100`,
+  },
 };
 
 export default API_ROUTES;
