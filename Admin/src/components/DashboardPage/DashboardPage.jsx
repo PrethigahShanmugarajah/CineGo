@@ -5,11 +5,7 @@ import API_ROUTES from "../../api/api_route";
 import { toast } from "react-toastify";
 import "./DashboardPage.css";
 import { Banknote, Ticket, Users } from "lucide-react";
-
-const fmtLKR = (num) =>
-  typeof num === "number"
-    ? `LKR${num.toLocaleString("en-LK", { maximumFractionDigits: 0 })}`
-    : "LKR 0";
+import { fmtLKR } from "../../utils/helper";
 
 const DashboardPage = () => {
   const [movies, setMovies] = useState([]);
