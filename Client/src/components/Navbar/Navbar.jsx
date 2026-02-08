@@ -31,11 +31,15 @@ const Navbar = () => {
 
   useEffect(() => {
     const readAuthFromStorage = () => {
-      const json = localStorage.getItem("cine_auth");
+      // const json = localStorage.getItem("cine_auth");
+      const json = localStorage.getItem("cinego_auth");
+
       if (json) {
         try {
           const parsed = JSON.parse(json);
-          setIsLoggedIn(Boolean(parsed?.isLoggedIn));
+          // setIsLoggedIn(Boolean(parsed?.isLoggedIn));
+          setIsLoggedIn(Boolean(parsed?.isLoggedIn === true));
+
           setUserEmail(parsed?.email || "");
           return;
         } catch (error) {}
@@ -66,7 +70,7 @@ const Navbar = () => {
     const onStorage = (e) => {
       if (
         ["cine_auth", "isLoggedIn", "userEmail", "cine_user_email"].includes(
-          e.key
+          e.key,
         )
       ) {
         readAuthFromStorage();
@@ -98,7 +102,8 @@ const Navbar = () => {
   }, [isMenuOpen]);
 
   const handleLogout = () => {
-    localStorage.removeItem("cine_auth");
+    // localStorage.removeItem("cine_auth");
+    localStorage.removeItem("cinego_auth");
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("userEmail");
     localStorage.removeItem("cine_user_email");
@@ -194,7 +199,7 @@ const Navbar = () => {
                 <button
                   title={userEmail || "Logout"}
                   onClick={handleLogout}
-                  className="flex items-center gap-2 md:px-1.5 px-4 lg:px-4 xl:px-4  py-2 rounded-full bg-linear-to-r from-gray-700 to-gray-800 text-white text-sm font-semibold border border-purple-600/20"
+                  className="flex items-center gap-2 md:px-1.5 px-4 lg:px-4 xl:px-4  py-2 rounded-full bg-linear-to-r from-gray-700 to-gray-800 text-white text-sm font-semibold border border-gray-600/20"
                 >
                   <LogOut className="h-4 w-4" />
                   <span>Logout</span>
