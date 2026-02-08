@@ -7,13 +7,17 @@ import {
   Clapperboard,
   Eye,
   EyeOff,
-  Film,
   Lock,
   Mail,
   Phone,
+  Theater,
   Ticket,
   User,
 } from "lucide-react";
+import api from "../../api/axios";
+import API_ROUTES from "../../api/api_route";
+import { ClipLoader } from "react-spinners";
+import { useNavigate } from "react-router-dom";
 
 const SignUpPage = () => {
   const [formData, setFormData] = useState({
@@ -28,6 +32,8 @@ const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -105,7 +111,7 @@ const SignUpPage = () => {
     window.history.back();
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
       toast.error("Please fix the form errors.");
@@ -118,14 +124,64 @@ const SignUpPage = () => {
     });
     setIsLoading(true);
 
-    setTimeout(() => {
-      setIsLoading(false);
-      toast.success("Signup Successfully!");
+    try {
+      const payload = {
+        fullName: formData.fullName.trim(),
+        username: formData.username.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim(),
+        birthDate: formData.birthDate,
+        password: formData.password,
+      };
 
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 2000);
-    }, 1500);
+      const response = await api.post(API_ROUTES.USER.USER_REGISTER, payload, {
+        headers: { "Content-Type": `application/json` },
+      });
+
+      console.log("User Register API Response:", response);
+
+      if (response?.data?.success) {
+        toast.success(response?.data?.message);
+        console.log("User Register Success:", response?.data?.message);
+
+        if (response.data.token) {
+          localStorage.setItem("token", response.data.token);
+        }
+
+        if (response.data.user) {
+          localStorage.setItem("user", JSON.stringify(response.data.user));
+
+          localStorage.setItem(
+            "cinego_auth",
+            JSON.stringify({
+              isLoggedIn: true,
+              email: response.data.user.email,
+            }),
+          );
+
+          window.dispatchEvent(
+            new StorageEvent("storage", {
+              key: "cinego_auth",
+              newValue: localStorage.getItem("cinego_auth"),
+            }),
+          );
+        }
+
+        // setTimeout(() => {
+        //   window.location.href = "/login";
+        // }, 1200);
+
+        navigate("/");
+      } else {
+        toast.warn(response?.data?.message);
+        console.warn("User Register Data Error:", response?.data?.message);
+      }
+    } catch (error) {
+      toast.error(error?.response?.data?.message || error?.message);
+      console.log("User Register Error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -411,14 +467,16 @@ const SignUpPage = () => {
                   }`}
                 >
                   {isLoading ? (
-                    <div className="flex items-center justify-center">
-                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2"></div>
-                      Creating Your Account...
+                    <div className="flex items-center justify-center gap-3">
+                      <ClipLoader size={18} color="#FFFFFF" />
+                      <span className="text-sm animate-pulse">
+                        Creating Your Account...
+                      </span>
                     </div>
                   ) : (
                     <div className="flex items-center justify-center">
-                      <Film className="mr-2" size={20} />
-                      <span className="font-cinema">Creat an Account</span>
+                      <Theater className="mr-2" size={20} />
+                      <span className="font-cinema">Create an Account</span>
                     </div>
                   )}
                 </button>
