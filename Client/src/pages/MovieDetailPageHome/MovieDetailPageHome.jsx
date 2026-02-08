@@ -21,7 +21,7 @@ import {
   formatTimeInTZ,
   getEmbedUrl,
   TOTAL_SEATS,
-} from "../../utils/helper";
+} from "../../utils/helper.jsx";
 
 const MovieDetailPageHome = () => {
   const { id } = useParams();
