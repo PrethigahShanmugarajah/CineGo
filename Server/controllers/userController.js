@@ -180,3 +180,28 @@ export const loginUser = async (req, res) => {
     });
   }
 };
+
+/* -------- Get All Users -------- */
+export const getUsers = async (req, res) => {
+  try {
+    const users = await User.find({})
+      .select("-password")
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return res.status(200).json({
+      success: true,
+      message: users.length ? "Users fetched successfully." : "No users found.",
+      length: users.length,
+      items: users,
+    });
+  } catch (error) {
+    console.error("Get All Users Error:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch users.",
+      error: `Get All Users Error: ${error.message}`,
+    });
+  }
+};
