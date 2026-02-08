@@ -1,7 +1,69 @@
 // CineGo / Client / src / components / ReleasePage / ReleasePage.jsx
-import movies from "../../assets/dummyrdata";
+import { useEffect, useState } from "react";
+import api from "../../api/axios";
+import API_ROUTES from "../../api/api_route";
+import { mapBackendMovieToUi } from "../../utils/helper";
+import { toast } from "react-toastify";
 
 const ReleasePage = () => {
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await api.get(API_ROUTES.MOVIE.MOVIE_GET_RELEASE_SOON);
+
+        console.log("Release Soon API Response:", response);
+
+        if (response?.data?.success) {
+          // toast.success(response?.data?.message);
+          console.log(
+            "Fetch Release Soon Movie Success:",
+            response?.data?.message,
+          );
+
+          const json = response.data;
+
+          const items = Array.isArray(json.items)
+            ? json.items
+            : Array.isArray(json.data)
+              ? json.data
+              : [];
+
+          const mapped = items.map(mapBackendMovieToUi);
+          if (!cancelled) setMovies(mapped);
+        } else {
+          toast.warn(response?.data?.message);
+          console.warn(
+            "Fetch Release Soon Movie Data Error:",
+            response?.data?.message,
+          );
+          if (!cancelled) setMovies([]);
+        }
+      } catch (error) {
+        toast.error(error?.response?.data?.message || error?.message);
+        console.error("Fetch Release Soon Movie Error:", error);
+
+        if (!cancelled) setError("Fail to load releases");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <div className="min-h-screen pt-25 bg-linear-to-br from-gray-900 to-black text-white p-6">
       <div className="text-center mb-12 mt-6">
