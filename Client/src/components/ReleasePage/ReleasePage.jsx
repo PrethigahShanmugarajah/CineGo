@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import API_ROUTES from "../../api/api_route";
-import { mapBackendMovieToUi } from "../../utils/helper";
+import { mapBackendMovieToUi } from "../../utils/helper.jsx";
 import { toast } from "react-toastify";
 
 const ReleasePage = () => {
