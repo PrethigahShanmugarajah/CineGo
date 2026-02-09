@@ -11,7 +11,7 @@ import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import movies from "../../assets/dummymdata";
 import "./SeatSelectorPage.css";
-import { ROWS, seatId } from "../../utils/helper";
+import { ROWS, seatId } from "../../utils/helper.jsx";
 
 const SeatSelectorPage = () => {
   const { id, slot } = useParams();
