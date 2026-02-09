@@ -124,3 +124,42 @@ export const formatTimeInTZ = (dateLike, timeZone = "Asia/Colombo") => {
     p.dayPeriod ?? p.ampm ?? "",
   ).toUpperCase()}`;
 };
+
+/* -------- Default number of movies to show before collapse -------- */
+export const COLLAPSE_COUNT = 12;
+
+/* -------- Movie categories for filtering -------- */
+export const categories = [
+  { id: "all", name: "All Movies" },
+  { id: "action", name: "Action" },
+  { id: "horror", name: "Horror" },
+  { id: "comedy", name: "Comedy" },
+  { id: "adventure", name: "Adventure" },
+];
+
+/* -------- Duplicate categories list (used for dropdowns / UI lists) -------- */
+export const categoriesList = [
+  { id: "all", name: "All Movies" },
+  { id: "action", name: "Action" },
+  { id: "horror", name: "Horror" },
+  { id: "comedy", name: "Comedy" },
+  { id: "adventure", name: "Adventure" },
+];
+
+/* -------- Map backend movie object to UI-friendly format -------- */
+export const mapBackendMovie = (m) => {
+  const id = m._id || m.id || "";
+  const title = m.movieName || m.title || "Untitled";
+  const rawing = m.poster || m.latestTrailer?.thumbnail || m.thumbnail || null;
+  const image = getUploadUrl(rawing) || PLACEHOLDER_IMG;
+
+  const cat =
+    (Array.isArray(m.categories) && m.categories[0]) ||
+    m.category ||
+    (Array.isArray(m.latestTrailer?.genres) && m.latestTrailer.genres[0]) ||
+    "General";
+
+  const category = String(cat || "General");
+
+  return { id, title, image, category, raw: m };
+};
