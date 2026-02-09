@@ -12,7 +12,7 @@ import {
 import { toast } from "react-toastify";
 import movies from "../../assets/dummymoviedata";
 import "./SeatSelectorPageHome.css";
-import { ROWS, seatId } from "../../utils/helper";
+import { ROWS, seatId } from "../../utils/helper.jsx";
 
 const SeatSelectorPageHome = () => {
   const { id, slot } = useParams();
