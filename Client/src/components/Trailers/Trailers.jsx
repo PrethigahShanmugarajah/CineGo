@@ -1,6 +1,5 @@
 // CineGo / Client / src / components / Trailers / Trailers.jsx
 import { useEffect, useRef, useState } from "react";
-import { trailersData } from "../../assets/trailerdata";
 import {
   Calendar,
   ChevronLeft,
@@ -11,13 +10,79 @@ import {
   X,
 } from "lucide-react";
 import "./Trailers.css";
+import { toast } from "react-toastify";
+import api from "../../api/axios";
+import API_ROUTES from "../../api/api_route";
+import {
+  mapMovieToTrailerItem,
+  PLACEHOLDER_IMG,
+  PLACEHOLDER_THUMB,
+} from "../../utils/helper";
+import { ClipLoader } from "react-spinners";
 
 const Trailers = () => {
-  const [featuredTrailer, setFeaturedTrailer] = useState(trailersData[0]);
+  const [featuredTrailer, setFeaturedTrailer] = useState([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+
   const videoRef = useRef(null);
   const carouselRef = useRef(null);
+
+  const [trailers, setTrailers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const ac = new AbortController();
+    setLoading(true);
+    setError(null);
+
+    const pickArray = (json) =>
+      (Array.isArray(json?.items) && json.items) ||
+      (Array.isArray(json?.movies) && json.movies) ||
+      (Array.isArray(json?.data) && json.data) ||
+      (Array.isArray(json?.results) && json.results) ||
+      [];
+
+    async function loadLatestTrailers() {
+      try {
+        const response = await api.get(
+          API_ROUTES.MOVIE.MOVIE_GET_LATEST_TRAILER,
+          { signal: ac.signal },
+        );
+
+        console.log("Fetch Latest Trailer API Response:", response);
+
+        const json = response.data;
+
+        if (json?.success) {
+          // toast.success(json?.message);
+          console.log("Fetch Latest Trailer Success:", json?.message);
+
+          const items = pickArray(json);
+          const mapped = items.map(mapMovieToTrailerItem);
+
+          console.log("Mapped Movies:", mapped);
+
+          setTrailers(mapped);
+          setFeaturedTrailer(mapped[0] || null);
+        } else {
+          toast.warn(json?.message);
+          console.warn("Fetch Latest Trailer Data Error:", json?.message);
+        }
+      } catch (error) {
+        toast.error(error?.response?.data?.message || error?.message);
+        console.error("Fetch Latest Trailer Error:", error);
+        setError("Failed to load from server");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadLatestTrailers();
+
+    return () => ac.abort();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {};
@@ -50,7 +115,7 @@ const Trailers = () => {
     try {
       if (carouselRef.current) {
         const el = carouselRef.current.querySelector(
-          `[data-id='${trailer.id}']`
+          `[data-id='${trailer.id}']`,
         );
         if (el) {
           const rect = el.getBoundingClientRect();
@@ -105,6 +170,27 @@ const Trailers = () => {
     return `${base}${sep}autoplay=1&mute=${isMuted ? 1 : 0}&rel=0`;
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-linear-to-b from-gray-100 to-gray-300 text-gray-900">
+        <div className="py-12 text-center text-gray-400 col-span-full rounded-lg flex items-center justify-center gap-3">
+          <ClipLoader size={18} color="#A855F7" />
+          <span className="text-sm animate-pulse">Loading Trailers...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-linear-to-b from-gray-100 to-gray-300 text-gray-900">
+        <div className="py-12 text-center text-red-400">{error}</div>
+      </div>
+    );
+  }
+
+  const dataToRender = trailers || [];
+
   return (
     <div className="min-h-screen bg-linear-to-b from-gray-100 to-gray-300 text-black">
       <main className="relative z-10 pt-20 pb-12 container mx-auto px-4 sm:px-6 lg:px-8">
@@ -137,7 +223,7 @@ const Trailers = () => {
                 </div>
 
                 <span className="text-sm text-gray-500">
-                  {trailersData.length} trailers
+                  {dataToRender.length} trailers
                 </span>
               </div>
 
@@ -146,7 +232,7 @@ const Trailers = () => {
                 className="flex overflow-x-auto scrollbar-hide space-x-3 pb-3 -mx-1"
                 style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
               >
-                {trailersData.map((trailer) => (
+                {dataToRender.map((trailer) => (
                   <div
                     key={trailer.id}
                     data-id={trailer.id}
@@ -170,7 +256,7 @@ const Trailers = () => {
                     aria-pressed={featuredTrailer.id === trailer.id}
                   >
                     <img
-                      src={trailer.thumbnail}
+                      src={trailer.thumbnail || PLACEHOLDER_IMG}
                       alt={trailer.title}
                       className="w-full h-full object-cover"
                       loading="lazy"
@@ -188,7 +274,7 @@ const Trailers = () => {
 
               <div className="mt-6 space-y-3">
                 <h3 className="font-bold text-lg">Now Trending</h3>
-                {trailersData.slice(0, 3).map((trailer) => (
+                {dataToRender.slice(0, 3).map((trailer) => (
                   <div
                     onClick={() => selectTrailer(trailer)}
                     role="button"
@@ -202,7 +288,7 @@ const Trailers = () => {
                   >
                     <div className="w-14 h-14 rounded-md overflow-hidden shrink-0">
                       <img
-                        src={trailer.thumbnail}
+                        src={trailer.thumbnail || PLACEHOLDER_IMG}
                         alt={trailer.title}
                         className="w-full h-full object-cover"
                         loading="lazy"
@@ -249,7 +335,7 @@ const Trailers = () => {
                 ) : (
                   <div className="relative aspect-video group bg-gray-900">
                     <img
-                      src={featuredTrailer.thumbnail}
+                      src={featuredTrailer.thumbnail || PLACEHOLDER_IMG}
                       alt={featuredTrailer.title}
                       className="w-full h-full object-cover"
                       loading="lazy"
@@ -314,7 +400,7 @@ const Trailers = () => {
                         >
                           <div className="w-16 h-16 rounded-full overflow-hidden shadow-sm">
                             <img
-                              src={person.image}
+                              src={person.image || PLACEHOLDER_THUMB}
                               alt={person.name}
                               className="w-full h-full object-cover"
                             />
@@ -328,7 +414,7 @@ const Trailers = () => {
                             {role}
                           </div>
                         </div>
-                      )
+                      ),
                     )}
                 </div>
               </div>
