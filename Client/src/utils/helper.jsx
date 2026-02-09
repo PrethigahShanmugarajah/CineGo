@@ -163,3 +163,126 @@ export const mapBackendMovie = (m) => {
 
   return { id, title, image, category, raw: m };
 };
+
+/* -------- Get full URL for trailer-related files (supports string or object inputs) -------- */
+export const getUploadUrlTrailer = (input) => {
+  if (!input) return null;
+
+  if (typeof input === "string") {
+    if (input.startsWith("http://") || input.startsWith("http://"))
+      return input;
+
+    return `${import.meta.env.VITE_BASEURL}/uploads/${input}`;
+  }
+
+  if (typeof input === "object") {
+    const possible =
+      input.url ||
+      input.path ||
+      input.filename ||
+      input.file ||
+      input.image ||
+      "";
+
+    if (possible) return getUploadUrlTrailer(possible);
+  }
+};
+
+/* -------- Format duration into a readable string (supports object, number, or string) -------- */
+export const formatDuration = (dur) => {
+  if (!dur) return "";
+  if (typeof dur === "string") return dur;
+  if (typeof dur === "number") return `${dur}m`;
+
+  const h = dur.hours ?? 0;
+  const m = dur.minutes ?? 0;
+  if (h && m) return `${h} h ${m}m`;
+  if (h) return `${h} h`;
+  if (m) return `${m}m`;
+  return "";
+};
+
+/* -------- Placeholder image for cast/credit avatars (director/producer/singer) -------- */
+export const PLACEHOLDER_THUMB =
+  "https://img.freepik.com/premium-vector/profile-icon-vector-image-can-be-used-ui_120816-260932.jpg?semt=ais_hybrid&w=740&q=80";
+
+/* -------- Map backend movie object to trailer UI item (title/thumbnail/video/genre/credits) -------- */
+export const mapMovieToTrailerItem = (movie) => {
+  const lt = movie.latestTrailer || {};
+  const title = lt.title || movie.movieName || movie.title || "Untitled";
+
+  const thumbnail =
+    getUploadUrlTrailer(lt.thumbnail) ||
+    getUploadUrlTrailer(movie.poster) ||
+    PLACEHOLDER_IMG;
+
+  const videoUrl =
+    lt.videoId || lt.videoUrl || movie.trailerUrl || movie.videoUrl || "";
+
+  const duration = lt.duration
+    ? formatDuration(lt.duration)
+    : movie.duration
+      ? formatDuration(movie.duration)
+      : "";
+
+  const year = lt.year || movie.year || "";
+
+  const genre =
+    lt.generes && lt.generes.length
+      ? lt.generes.join(", ")
+      : movie.categories && movie.categories.length
+        ? movie.categories.join(",")
+        : "";
+
+  const description = lt.description || movie.story || "";
+
+  const credits = {};
+  const firstDirector = (lt.directors || movie.directors || []).find(Boolean);
+  const firstProducer = (lt.producers || movie.producers || []).find(Boolean);
+  const firstSinger = (lt.singers || movie.singers || []).find(Boolean);
+
+  if (firstDirector) {
+    credits["Director"] = {
+      name: firstDirector.name || "Unknown",
+      image:
+        getUploadUrlTrailer(firstDirector.file) ||
+        getUploadUrlTrailer(firstDirector.image) ||
+        getUploadUrlTrailer(firstDirector.photo) ||
+        PLACEHOLDER_THUMB,
+    };
+  }
+
+  if (firstProducer) {
+    credits["Producer"] = {
+      name: firstProducer.name || "Unknown",
+      image:
+        getUploadUrlTrailer(firstProducer.file) ||
+        getUploadUrlTrailer(firstProducer.image) ||
+        getUploadUrlTrailer(firstProducer.photo) ||
+        PLACEHOLDER_THUMB,
+    };
+  }
+
+  if (firstSinger) {
+    credits["Singer"] = {
+      name: firstSinger.name || "Unknown",
+      image:
+        getUploadUrlTrailer(firstSinger.file) ||
+        getUploadUrlTrailer(firstSinger.image) ||
+        getUploadUrlTrailer(firstSinger.photo) ||
+        PLACEHOLDER_THUMB,
+    };
+  }
+
+  return {
+    id: movie._id || movie.id,
+    title,
+    thumbnail,
+    videoUrl,
+    duration,
+    year,
+    genre,
+    description,
+    credits,
+  };
+};
