@@ -11,6 +11,7 @@ const API_ROUTES = {
     MOVIE_GET_FEATURED: `${BASE_URL}/api/movie/movies-get?featured=true`,
     MOVIE_GET_NORMAL: `${BASE_URL}/api/movie/movies-get?type=normal&limit=200`,
     MOVIE_GET: `${BASE_URL}/api/movie/movies-get&limit=200`,
+    MOVIE_GET_LATEST_TRAILER: `${BASE_URL}/api/movie/movies-get?type=latestTrailers&limit=50`,
   },
 };
 
