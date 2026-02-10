@@ -129,9 +129,24 @@ export const createMovie = async (req, res) => {
     });
 
     const savedMovie = await doc.save();
+
+    let successMessage = "Movie created successfully!";
+
+    switch (savedMovie.type) {
+      case "featured":
+        successMessage = "Featured movie created successfully!";
+        break;
+      case "releaseSoon":
+        successMessage = "Release Soon movie created successfully!";
+        break;
+      case "latestTrailers":
+        successMessage = "Latest Trailer created successfully!";
+        break;
+    }
+
     return res.status(201).json({
       success: true,
-      message: "Movie created successfully!",
+      message: successMessage,
       data: savedMovie,
     });
   } catch (error) {
@@ -203,9 +218,25 @@ export const getMovies = async (req, res) => {
       .lean();
 
     const normalized = (items || []).map(normalizeItemForOutput);
+
+    let successMessage = "Movies fetched successfully!";
+    const movieType = type?.trim();
+
+    switch (movieType) {
+      case "featured":
+        successMessage = "Featured movies fetched successfully!";
+        break;
+      case "releaseSoon":
+        successMessage = "Release Soon movies fetched successfully!";
+        break;
+      case "latestTrailers":
+        successMessage = "Latest trailers fetched successfully!";
+        break;
+    }
+
     return res.json({
       success: true,
-      message: "Movies fetched successfully!",
+      message: successMessage,
       total,
       page: pg,
       limit: lim,
@@ -255,9 +286,18 @@ export const getMovieById = async (req, res) => {
         "";
     }
 
+    const messages = {
+      normal: "Movie fetched successfully!",
+      featured: "Featured movie fetched successfully!",
+      releaseSoon: "Release Soon movie fetched successfully!",
+      latestTrailers: "Latest trailer fetched successfully!",
+    };
+
+    const successMessage = messages[item.type] || "Movie fetched successfully!";
+
     return res.status(200).json({
       success: true,
-      message: "Movie fetched successfully!",
+      message: successMessage,
       item: objmov,
     });
   } catch (error) {
