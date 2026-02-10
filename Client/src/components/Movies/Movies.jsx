@@ -21,10 +21,9 @@ const Movies = () => {
 
     async function loadFeaturedMovies() {
       try {
-        const response = await api.get(
-          API_ROUTES.MOVIE.MOVIE_GET_RELEASE_SOON,
-          { signal: ac.signal },
-        );
+        const response = await api.get(API_ROUTES.MOVIE.MOVIE_GET_FEATURED, {
+          signal: ac.signal,
+        });
 
         console.log("Featured Featured Movie API Response:", response);
 
