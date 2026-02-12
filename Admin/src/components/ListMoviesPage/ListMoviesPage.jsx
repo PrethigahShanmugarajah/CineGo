@@ -72,7 +72,7 @@ const ListMoviesPage = () => {
 
       console.log("API params:", params);
 
-      const response = await api.get(API_ROUTES.MOVIE.MOVIE_GET, {
+      const response = await api.get(API_ROUTES.MOVIE.MOVIES_GET, {
         params,
       });
 
