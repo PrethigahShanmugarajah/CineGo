@@ -18,7 +18,9 @@ const ReleasePage = () => {
       setError(null);
 
       try {
-        const response = await api.get(API_ROUTES.MOVIE.MOVIE_GET_RELEASE_SOON);
+        const response = await api.get(
+          API_ROUTES.MOVIE.MOVIES_GET_RELEASE_SOON,
+        );
 
         console.log("Release Soon API Response:", response);
 
