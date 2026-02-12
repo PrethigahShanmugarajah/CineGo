@@ -8,6 +8,7 @@ import API_ROUTES from "../../api/api_route";
 import { toast } from "react-toastify";
 import { ClipLoader } from "react-spinners";
 import { getUploadUrl, PLACEHOLDER_IMG } from "../../utils/helper.jsx";
+import "./Movies.css";
 
 const Movies = () => {
   const [movies, setMovies] = useState([]);
@@ -21,15 +22,18 @@ const Movies = () => {
 
     async function loadFeaturedMovies() {
       try {
-        const response = await api.get(API_ROUTES.MOVIE.MOVIE_GET_FEATURED, {
+        const response = await api.get(API_ROUTES.MOVIE.MOVIES_GET_FEATURED, {
           signal: ac.signal,
         });
 
-        console.log("Featured Featured Movie API Response:", response);
+        console.log("Featured Featured Movies API Response:", response);
 
         if (response?.data?.success) {
           // toast.success(response?.data?.message);
-          console.log("Fetch Featured Movie Success:", response?.data?.message);
+          console.log(
+            "Fetch Featured Movies Success:",
+            response?.data?.message,
+          );
 
           const json = response.data;
 
@@ -54,13 +58,13 @@ const Movies = () => {
         } else {
           toast.warn(response?.data?.message);
           console.warn(
-            "Fetch Featured Movie Data Error:",
+            "Fetch Featured Movies Data Error:",
             response?.data?.message,
           );
         }
       } catch (error) {
         toast.error(error?.response?.data?.message || error?.message);
-        console.error("Fetch Featured Movie Movie Error:", error);
+        console.error("Fetch Featured Movies Error:", error);
 
         if (
           error.name === "AbortError" ||
@@ -84,10 +88,7 @@ const Movies = () => {
 
   return (
     <section className={moviesStyles.container}>
-      <h2
-        style={{ fontFamily: "'Dancing Script','cursive'" }}
-        className="text-3xl sm:text-4xl md:text-5xl text-center mb-8"
-      >
+      <h2 className="featured-title text-3xl sm:text-4xl md:text-5xl text-center mb-8">
         Featured Movies
       </h2>
 
@@ -141,8 +142,7 @@ const Movies = () => {
                     <Tickets className="h-4 w-4 text-purple-600" />
                     <span
                       id={`movie-title-${movieId}`}
-                      className="text-base sm:text-lg font-medium truncate"
-                      style={{ fontFamily: "'Dancing Script','cursive'" }}
+                      className="featured-title  text-base sm:text-lg font-medium truncate"
                     >
                       {title}
                     </span>
