@@ -25,10 +25,7 @@ const Banner = () => {
       {/* -------- Content -------- */}
       <div className="relative z-10 flex items-center justify-start h-full px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
         <div className="max-w-2xl mt-10 md:mt-0">
-          <h1
-            className="text-4xl sm:text-5xl md:text-7xl font-bold text-white mb-4 leading-tight"
-            style={{ fontFamily: "'Dancing Script', 'cursive'" }}
-          >
+          <h1 className="banner-title text-4xl sm:text-5xl md:text-7xl font-bold text-white mb-4 leading-tight">
             The Horizon Beyond
           </h1>
 
