@@ -10,185 +10,581 @@ import {
   Ticket,
 } from "lucide-react";
 import { toast } from "react-toastify";
-import movies from "../../assets/dummymoviedata";
 import "./SeatSelectorPageHome.css";
-import { ROWS, seatId } from "../../utils/helper.jsx";
+import {
+  getAuthToken,
+  normalizeSeatId,
+  ROWS,
+  sameMinute,
+  seatId,
+  slotToISO,
+} from "../../utils/helper.jsx";
+import api from "../../api/axios.js";
+import API_ROUTES from "../../api/api_route.js";
 
 const SeatSelectorPageHome = () => {
   const { id, slot } = useParams();
-  const movieId = Number(id);
+  const movieIdParam = id;
   const slotKey = slot ? decodeURIComponent(slot) : "";
 
   const navigate = useNavigate();
 
-  const movie = useMemo(
-    () => (movies || []).find((m) => Number(m.id) === movieId),
-    [movieId],
+  const [movie, setMovie] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [booked, setBooked] = useState(new Set());
+  const [selected, setSelected] = useState(new Set());
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    Boolean(getAuthToken()),
   );
+  const [bookingLoading, setBookingLoading] = useState(false);
+
+  useEffect(() => {
+    setIsAuthenticated(Boolean(getAuthToken()));
+  }, []);
+
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (
+        ["token", "authToken", "accessToken", "jwt"].includes(e.key) ||
+        e.key === null
+      ) {
+        setIsAuthenticated(Boolean(getAuthToken()));
+      }
+    };
+
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    const fetchMovie = async () => {
+      setLoading(true);
+
+      try {
+        const response1 = await api.get(
+          API_ROUTES.MOVIE.MOVIE_GET(movieIdParam),
+        );
+
+        console.log("Fetch Movie API Response:", response1);
+
+        if (!mounted) return;
+
+        if (response1?.data?.success) {
+          if (!response1.data || response1.data === false) {
+            toast.error(response1?.data?.message || "Failed to load movie");
+            setMovie(null);
+          } else {
+            const item =
+              response1?.data?.item ||
+              response1?.data?.data ||
+              response1?.data?.movie ||
+              response1.data;
+
+            setMovie(item || null);
+          }
+
+          // toast.success(response1?.data?.message);
+          console.log("Fetch Movie Success:", response1?.data?.message);
+        } else {
+          toast.warn(response1?.data?.message);
+          console.warn("Fetch Movie Data Error:", response1?.data?.message);
+        }
+      } catch (error1) {
+        toast.error(error1?.response?.data?.message || error1?.message);
+        console.error("Fetch Movie Movie Error:", error1);
+        setMovie(null);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    if (movieIdParam) fetchMovie();
+    else {
+      setLoading(false);
+      setMovie(null);
+    }
+
+    return () => {
+      mounted = false;
+    };
+  }, [movieIdParam]);
 
   const slotObj = useMemo(() => {
     if (!movie || !slotKey) return null;
-    if (!Array.isArray(movie.slots)) return null;
 
-    const asObj = movie.slots.find(
-      (s) =>
-        s &&
-        typeof s === "object" &&
-        (s.time === slotKey || s.time === decodeURIComponent(slotKey)),
-    );
+    const slots = Array.isArray(movie.slots)
+      ? movie.slots
+      : Array.isArray(movie.showtimes)
+        ? movie.showtimes
+        : [];
 
-    if (asObj) return asObj;
+    if (!slots.length) return null;
 
-    const asString = movie.slots.find(
+    const sString = slots.find(
       (s) =>
         typeof s === "string" &&
         (s === slotKey || s === decodeURIComponent(slotKey)),
     );
 
-    if (asString) return { time: asString, audi: "Audi 1" };
+    if (sString) return { time: sString, audi: "Audi 1", _iso: sString };
 
+    for (const s of slots) {
+      if (!s) continue;
+      if (typeof s === "object") {
+        const iso = slotToISO(s);
+        if (!iso) continue;
+        if (iso === slotKey || iso === decodeURIComponent(slotKey))
+          return { ...s, _iso: iso };
+      }
+    }
+
+    try {
+      const providedIs = new Date(slotKey).getTime();
+      if (!isNaN(providedIs)) {
+        for (const s of slots) {
+          const iso = slotToISO(s);
+          if (!iso) continue;
+          const ts = new Date(iso).getTime();
+          if (!isNaN(ts) && ts === providedIs) return { ...s, _iso: iso };
+        }
+      }
+    } catch (error) {}
     return null;
   }, [movie, slotKey]);
 
-  const audiName = slotObj?.audi ?? "Audi 1";
+  const audiName = useMemo(() => {
+    if (slotObj && slotObj?.auditorium && String(slotObj.auditorium).trim())
+      return String(slotObj.auditorium).trim();
+
+    if (slotObj && slotObj?.audi && String(slotObj.audi).trim())
+      return String(slotObj.audi).trim();
+
+    if (movie && movie?.auditorium && String(movie.auditorium).trim())
+      return String(movie.auditorium).trim();
+
+    if (movie && movie?.audi && String(movie?.audi).trim())
+      return String(movie.audi).trim();
+
+    if (movie && movie?.hall && String(movie?.hall).trim())
+      return String(movie.hall).trim();
+
+    return "Audi 1";
+  }, [slotObj, movie]);
 
   useEffect(() => {
+    if (!slotKey) {
+      toast.error("Missing showtime. Select a time from the movie page");
+      navigate(
+        movie ? `/movies/${movie._id || movie.id || movieIdParam}` : "/movies",
+      );
+      return;
+    }
+
     const isValidDate = !!slotKey && !isNaN(new Date(slotKey).getTime());
-    if (!isValidDate) {
+    if (!isValidDate && !slotObj) {
       toast.error(
         "Invalid or missing showtime. Please select a time from the movie page.",
       );
-      setTimeout(() => {
-        if (movie) navigate(`/movie/${movie.id}`);
-        else navigate("/movies");
-      }, 600);
+      navigate(
+        movie ? `/movies/${movie._id || movie.id || movieIdParam}` : "/movies",
+      );
     }
-  }, [slotKey, movie, navigate]);
+  }, [slotKey, movie, slotObj]);
 
-  const storageKey = `bookings_${movieId}_${slotKey}_${audiName}`;
-
-  const legacyKey = `bookings_${movieId}_${slotKey}`;
-
-  const [booked, setBooked] = useState(new Set());
-  const [selected, setSelected] = useState(new Set());
+  const mid = movie ? movie._id || movie.id || movieIdParam : movieIdParam;
+  const storageKey = `bookings_${mid}_${slotKey}_${audiName}`;
+  const legacyKey = `bookings_${mid}_${slotKey}`;
 
   useEffect(() => {
-    if (!movie) {
-      toast.error("Movie not found.");
-      setTimeout(() => navigate("/movies"), 600);
-      return;
-    }
-  }, [movie, navigate]);
+    let cancelled = false;
 
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem(storageKey);
+    const setBookedAndPrune = (arr) => {
+      const set = new Set(arr);
+      if (cancelled) return;
+      setBooked((prev) => {
+        const same =
+          prev.size === set.size && [...prev].every((v) => set.has(v));
+        if (same) return prev;
+        setSelected((selPrev) => {
+          const nextSel = new Set(selPrev);
+          for (const s of set) nextSel.delete(s);
+          return nextSel;
+        });
 
-      if (raw) {
-        const arr = JSON.parse(raw);
-        setBooked(new Set(arr));
-      } else {
-        const legacyRaw = localStorage.getItem(legacyKey);
+        return set;
+      });
 
-        if (legacyRaw) {
-          const legacyArr = JSON.parse(legacyRaw);
-          const s = new Set(Array.isArray(legacyArr) ? legacyArr : []);
-          setBooked(s);
-          localStorage.setItem(storageKey, JSON.stringify([...s]));
+      try {
+        localStorage.setItem(storageKey, JSON.stringify([...set]));
+      } catch (error) {}
+    };
+
+    const fetchBooked = async () => {
+      if (!movieIdParam || !slotKey) return;
+      const showtimeQuery = slotObj && slotObj._iso ? slotObj._iso : slotKey;
+
+      try {
+        const token = getAuthToken();
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+        const response2 = await api.get(API_ROUTES.BOOKING.BOOKING_GET, {
+          params: { movieId: movieIdParam, limit: 1000 },
+          headers,
+          timeout: 8000,
+        });
+
+        console.log("Fetch Bookings API Response:", response2);
+
+        if (response2?.data?.success) {
+          let items = [];
+          if (Array.isArray(response2?.data)) items = response2.data;
+          else if (Array.isArray(response2?.data?.items))
+            items = response2.data.items;
+          else if (Array.isArray(response2?.data?.bookings))
+            items = response2.data.bookings;
+
+          const paidSeats = [];
+
+          for (const b of items) {
+            const bShowRaw =
+              b?.showtime ||
+              b?.slot ||
+              b?.time ||
+              b?.showtimeIso ||
+              b?._iso ||
+              null;
+
+            if (!bShowRaw) continue;
+            if (!sameMinute(bShowRaw, showtimeQuery)) continue;
+
+            const bAudi = (
+              b?.auditorium ||
+              b?.audi ||
+              b?.audiName ||
+              ""
+            ).toString();
+            if (
+              bAudi &&
+              audiName &&
+              bAudi.toLowerCase() !== audiName.toLowerCase()
+            )
+              continue;
+
+            const ps = (b?.paymentStatus || b?.payment_status || "")
+              .toString()
+              .toLowerCase();
+            if (ps !== "paid") continue;
+
+            const sarr = Array.isArray(b?.seats)
+              ? b.seats
+                  .map((s) =>
+                    typeof s === "string" ? s : (s && (s.seatId || s.id)) || "",
+                  )
+                  .filter(Boolean)
+              : Array.isArray(b?.seatIds)
+                ? b.seatIds.map(String).filter(Boolean)
+                : [];
+
+            for (const s of sarr) paidSeats.push(normalizeSeatId(s));
+          }
+
+          if (!cancelled) {
+            if (paidSeats.length > 0) {
+              setBookedAndPrune(paidSeats);
+            } else {
+              setBooked(new Set());
+              try {
+                localStorage.setItem(storageKey, JSON.stringify([]));
+              } catch (error) {}
+            }
+          }
+
+          // toast.success(response2?.data?.message);
+          console.log("Fetch Bookings Success:", response2?.data?.message);
         } else {
-          setBooked(new Set());
+          toast.warn(response2?.data?.message);
+          console.warn("Fetch Bookings Data Error:", response2?.data?.message);
         }
+
+        return;
+      } catch (error2) {
+        toast.error(error2?.response?.data?.message || error2?.message);
+        console.error("Fetch Bookings Error:", error2);
       }
-    } catch (error) {
-      console.error("Failed to read bookings from storage:", error);
-      setBooked(new Set());
+
+      try {
+        const token = getAuthToken();
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+        const response3 = await api.get(
+          API_ROUTES.BOOKING.BOOKING_GET_OCCUPIED,
+          {
+            params: { movieId: movieIdParam, limit: 1000 },
+            headers,
+            timeout: 8000,
+          },
+        );
+
+        console.log("Fetch Occupied Seats API Response:", response3);
+
+        if (response3?.data?.success) {
+          if (Array.isArray(response3?.data?.occupied)) {
+            const normalized = response3.data.occupied
+              .map((s) => normalizeSeatId(s))
+              .filter(Boolean);
+
+            setBookedAndPrune(normalized);
+            return;
+          }
+
+          toast.success(response3?.data?.message);
+          console.log(
+            "Fetch Occupied Seats Success:",
+            response3?.data?.message,
+          );
+        } else {
+          toast.warn(response3?.data?.message);
+          console.warn(
+            "Fetch Occupied Seats Data Error:",
+            response3?.data?.message,
+          );
+        }
+
+        throw new Error("Invalid occupied response");
+      } catch (error3) {
+        toast.error(error3?.response?.data?.message || error3?.message);
+        console.error("Fetch Bookings Error:", error3);
+
+        if (cancelled) return;
+
+        try {
+          const raw = localStorage.getItem(storageKey);
+          if (raw) {
+            const arr = JSON.parse(raw);
+            const normalized = Array.isArray(arr)
+              ? arr.map(normalizeSeatId).filter(Boolean)
+              : [];
+
+            setBooked(new Set(normalized));
+            return;
+          }
+
+          const legacyRaw = localStorage.getItem(legacyKey);
+          if (legacyKey) {
+            const arrLegacy = JSON.parse(legacyRaw);
+            const s = new Set(
+              Array.isArray(arrLegacy) ? arrLegacy.map(normalizeSeatId) : [],
+            );
+            setBooked(s);
+
+            try {
+              localStorage.setItem(storageKey, JSON.stringify([...s]));
+            } catch (error) {}
+
+            return;
+          }
+        } catch (error) {
+          console.error("Fallback read failed:", error);
+        }
+
+        setBooked(new Set());
+      }
+    };
+
+    fetchBooked();
+    return () => {
+      cancelled = true;
+    };
+  }, [movieIdParam, slotKey, audiName, slotObj]);
+
+  useEffect(() => {
+    if (!loading && !movie) {
+      toast.error("Movie not found.");
+      navigate("/movies");
     }
-    setSelected(new Set());
-  }, [storageKey]);
+  }, [loading, movie, navigate]);
 
   const toggleSeat = (id) => {
-    if (booked.has(id)) {
-      console.log(`Seat ${id} is already booked. Booking details:`, {
-        movie: movie?.title,
-        showtime: slotKey,
-        audi: audiName,
-        seat: id,
-        status: "booked",
-      });
-      toast.error(`Seat ${id} already booked.`);
+    const nid = normalizeSeatId(id);
+    if (booked.has(nid)) {
+      toast.info(`Seat ${nid} already booked`);
       return;
     }
+
     setSelected((prev) => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      next.has(nid) ? next.delete(nid) : next.add(nid);
       return next;
     });
   };
 
   const clearSelection = () => setSelected(new Set());
 
-  const confirmBooking = () => {
+  const basePriceRupee =
+    Number(movie?.seatPrices?.standard ?? movie?.price ?? 0) || 0;
+  const standardPaise = Math.round(basePriceRupee * 100);
+
+  const reclinerRupee =
+    typeof movie?.seatPrices?.recliner !== "undefined" &&
+    movie?.seatPrices?.recliner !== null
+      ? Number(movie.seatPrices.recliner)
+      : null;
+
+  const reclinerPaise =
+    reclinerRupee !== null
+      ? Math.round(reclinerRupee * 100)
+      : Math.round(standardPaise * 1.5);
+
+  const confirmBooking = async () => {
     if (selected.size === 0) {
-      toast.error("Select at least one seat.");
+      toast.warn("Select at least one seat.");
       return;
     }
 
-    const newBooked = new Set([...booked, ...selected]);
+    const token = getAuthToken();
 
-    const arr = [...newBooked];
+    if (!token) {
+      toast.error("You must be logged in to book seats.");
+      const returnUrl = encodeURIComponent(
+        window.location.pathname + window.location.search,
+      );
+      setTimeout(() => navigate(`/login?redirect=${returnUrl}`), 4000);
+      return;
+    }
+
+    const seatsArr = [...selected].sort();
+    setBookingLoading(true);
 
     try {
-      localStorage.setItem(storageKey, JSON.stringify(arr));
-    } catch (error) {
-      console.error("Failed to save booking:", error);
-      toast.error("Failed to confirm booking. Try again.");
-      return;
+      const payload = {
+        movieId: movie?._id || movie?.id || movieIdParam,
+        movieName: movie?.title || movie?.movieName || movie?.name || "",
+        showtime: slotKey,
+        auditorium: audiName,
+        seats: seatsArr,
+        paymentMethod: "card",
+        currency: "LKR",
+        email: "",
+      };
+
+      const response4 = await api.post(
+        API_ROUTES.BOOKING.BOOKING_CREATE,
+        payload,
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      console.log("Booking Movies API Response:", response4);
+
+      if (response4?.data?.success) {
+        toast.success(response4?.data?.message);
+        console.log("Booking Movies Success:", response4?.data?.message);
+
+        if (response4?.data?.checkout?.url) {
+          const newBooked = new Set([
+            ...booked,
+            ...seatsArr.map(normalizeSeatId),
+          ]);
+
+          try {
+            localStorage.setItem(storageKey, JSON.stringify([...newBooked]));
+          } catch (error) {}
+
+          window.location.href = response4?.data?.checkout.url;
+          return;
+        }
+
+        const newBooked = new Set([
+          ...booked,
+          ...seatsArr.map(normalizeSeatId),
+        ]);
+
+        setBooked(newBooked);
+        setSelected(new Set());
+
+        try {
+          localStorage.setItem(storageKey, JSON.stringify([...newBooked]));
+        } catch (error) {}
+
+        toast.success(
+          `${seatsArr.length} seat(s) reserved - procedd to payment`,
+        );
+        return;
+      } else {
+        toast.warn(response4?.data?.message);
+        console.warn("Booking Movies Data Error:", response4?.data?.message);
+      }
+
+      toast.error(
+        (response4.data && response4.data.message) ||
+          "Failed to create booking on server",
+      );
+    } catch (error4) {
+      toast.error(error4?.response?.data?.message || error4?.message);
+      console.error("Booking Movies Error:", error4);
+
+      if (error4?.response?.status === 401) {
+        toast.error("Session ecpired - please log in again.");
+        ["token", "authToken", "accessToken", "jwt"].forEach((k) =>
+          localStorage.removeItem(k),
+        );
+
+        setIsAuthenticated(false);
+        const returnUrl = encodeURIComponent(
+          window.location.pathname + window.location.search,
+        );
+
+        setTimeout(() => navigate(`/login?redirect=${returnUrl}`), 400);
+        return;
+      }
+
+      if (error4?.response4?.status === 409) {
+        const occupied = error4.response4?.data?.occupied || [];
+        if (occupied.length > 0) {
+          setBooked((prev) => {
+            const next = new Set(prev);
+            occupied.forEach((s) => next.add(normalizeSeatId(s)));
+
+            try {
+              localStorage.setItem(storageKey, JSON.stringify([...next]));
+            } catch (error) {}
+            return next;
+          });
+
+          setSelected((prev) => {
+            const next = new Set(prev);
+            occupied.forEach((s) => next.delete(normalizeSeatId(s)));
+            return next;
+          });
+
+          toast.error(
+            `Some seats just booked by others: ${occupied.join(",")}`,
+          );
+        } else {
+          toast.error(
+            error4?.response?.data?.message || "Some seats are already booked.",
+          );
+        }
+
+        return;
+      }
+
+      toast.error(
+        error4?.response3?.data?.message || "Failed to create booking",
+      );
+    } finally {
+      setBookingLoading(false);
     }
-
-    const bookingDetails = {
-      movie: movie?.title,
-      movieId: movieId,
-      showtime: slotKey,
-      audi: audiName,
-      bookedSeats: [...selected].sort(),
-      totalSeats: selected.size,
-      totalAmount: Math.round(
-        [...selected].reduce((sum, s) => {
-          const rowLetter = s[0];
-          const def = ROWS.find((r) => r.id === rowLetter);
-          const multiplier = def?.type === "recliner" ? 1.5 : 1;
-          return sum + (movie?.price ?? 0) * multiplier;
-        }, 0),
-      ),
-      bookingTime: new Date().toISOString(),
-      bookingId: `B${Date.now()}`,
-    };
-
-    console.log("Booking Confirmed:", bookingDetails);
-    console.table(bookingDetails);
-
-    setBooked(newBooked);
-    setSelected(new Set());
-
-    toast.success(
-      <div>
-        <div className="font-bold">Booking Confirmed!</div>
-        <div className="text-sm">
-          {bookingDetails.totalSeats} seat(s) booked successfully
-        </div>
-      </div>,
-    );
   };
 
-  const basePrice = movie?.price ?? 0;
-  const total = [...selected].reduce((sum, s) => {
+  const totalPaise = [...selected].reduce((sum, s) => {
     const rowLetter = s[0];
     const def = ROWS.find((r) => r.id === rowLetter);
-    const multiplier = def?.type === "recliner" ? 1.5 : 1;
-    return sum + basePrice * multiplier;
+    const seatPaise = def?.type === "recliner" ? reclinerPaise : standardPaise;
+    return sum + (seatPaise || 0);
   }, 0);
 
+  const total = (totalPaise / 100).toFixed(2);
   const selectedCount = selected.size;
 
   return (
@@ -296,7 +692,7 @@ const SeatSelectorPageHome = () => {
                             title={
                               isBooked
                                 ? `Seat ${id} - Already Booked`
-                                : `Seat ${id} (${row.type}) - LKR${row.type === "recliner" ? Math.round(basePrice * 1.5) : basePrice}`
+                                : `Seat ${id} (${row.type}) - LKR${row.type === "recliner" ? Math.round(basePriceRupee * 1.5) : basePriceRupee}`
                             }
                             aria-label={isSelected}
                           >
@@ -419,7 +815,7 @@ const SeatSelectorPageHome = () => {
                     <div className="text-sm text-gray-300">Standard</div>
 
                     <div className="font-bold text-purple-400">
-                      LKR {basePrice}
+                      LKR {basePriceRupee}
                     </div>
                   </div>
                 </div>
@@ -429,7 +825,7 @@ const SeatSelectorPageHome = () => {
                     <div className="text-sm text-gray-300">Recliner</div>
 
                     <div className="font-bold text-pink-400">
-                      LKR {Math.round(basePrice * 1.5)}
+                      LKR {Math.round(basePriceRupee * 1.5)}
                     </div>
                   </div>
                 </div>
