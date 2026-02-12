@@ -11,6 +11,7 @@ import {
   Phone,
   Popcorn,
   Star,
+  Theater,
   Ticket,
   Twitter,
   Youtube,
@@ -96,7 +97,7 @@ const Footer = () => {
               <div className="relative">
                 <div className="absolute -inset-1 sm:-inset-2 bg-purple-600 rounded-full blur opacity-75 animate-pulse"></div>
                 <div className="relative bg-black p-2 sm:p-3 rounded-full border border-purple-600">
-                  <Clapperboard className="h-7 w-7 sm:h-8 sm:w-8 text-purple-500" />
+                  <Theater className="h-7 w-7 sm:h-8 sm:w-8 text-purple-500" />
                 </div>
               </div>
 
