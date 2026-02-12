@@ -286,3 +286,66 @@ export const mapMovieToTrailerItem = (movie) => {
     credits,
   };
 };
+
+/* -------- Convert 12-hour time to 24-hour format -------- */
+export const to24Hour = (timeStr = "00:00", ampm = "") => {
+  const [hRaw = "0", mRaw = "00"] = String(timeStr).split(":");
+  let h = Number(hRaw || 0);
+  const m = String(Number(mRaw) || 0).padStart(2, "0");
+  const a = (ampm || "").toUpperCase();
+  if (a === "AM" && h === 12) h = 0;
+  if (a === "PM" && h !== 12) h += 12;
+  return `${String(h).padStart(2, "0")}:${m}`;
+};
+
+/* -------- Convert slot data into ISO datetime -------- */
+export const slotToISO = (slot) => {
+  if (!slot) return null;
+  if (typeof slot === "string") return slot;
+  if (typeof slot === "object") {
+    if (slot.date && (slot.time || slot.datetime || slot.iso)) {
+      const hhmm = to24Hour(
+        slot.time || slot.datetime || slot.iso || "00:00",
+        slot.ampm || slot.amp || "",
+      );
+      return `${slot.date}T${hhmm}:00+05:30`;
+    }
+    if (slot.datetime) return slot.datetime;
+    if (slot.time && typeof slot.time === "string") return slot.time;
+  }
+
+  return null;
+};
+
+/* -------- Get authentication token from localStorage -------- */
+export const getAuthToken = () =>
+  localStorage.getItem("token") ||
+  localStorage.getItem("authToken") ||
+  localStorage.getItem("accessToken") ||
+  localStorage.getItem("jwt") ||
+  null;
+
+/* -------- Normalize seat ID (trim + uppercase) -------- */
+export const normalizeSeatId = (s) => (s ? String(s).trim().toUpperCase() : "");
+
+/* -------- Check if two datetimes match within the same minute -------- */
+export const sameMinute = (a, b) => {
+  if (!a || !b) return false;
+  const da = new Date(a),
+    db = new Date(b);
+
+  if (isNaN(da.getTime()) || isNaN(db.getTime())) return false;
+
+  da.setSeconds(0, 0);
+  db.setSeconds(0, 0);
+  return da.getTime() === db.getTime();
+};
+
+/* -------- Get full image URL from relative/absolute path -------- */
+export function getImageUrl(candidate) {
+  if (!candidate || typeof candidate !== "string") return null;
+  const s = candidate.trim();
+  if (!s) return null;
+  if (s.startsWith("http://") || s.startsWith("https://")) return s;
+  return `${import.meta.env.VITE_BASEURL}/uploads/${s.replace(/uploads\//, "")}`;
+}
