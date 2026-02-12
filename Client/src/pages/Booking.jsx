@@ -1,5 +1,5 @@
 // CineGo / Client / src / pages / Booking.jsx
-import BookingPage from "../components/BookingPage";
+import BookingPage from "../components/BookingPage/BookingPage";
 
 const Booking = () => {
   return (
