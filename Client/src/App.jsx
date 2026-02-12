@@ -16,6 +16,7 @@ import MovieDetailPage from "./pages/MovieDetailPage/MovieDetailPage";
 import MovieDetailPageHome from "./pages/MovieDetailPageHome/MovieDetailPageHome";
 import SeatSelector from "./pages/SeatSelector/SeatSelector";
 import SeatSelectorHome from "./pages/SeatSelectorHome/SeatSelectorHome";
+import VerifyPayment from "./pages/VerifyPayment/VerifyPayment";
 
 function ScrollToTop() {
   const location = useLocation();
@@ -101,6 +102,9 @@ const App = () => {
             path="/movie/:id/seat-selector/:slot"
             element={<SeatSelectorHome />}
           />
+
+          <Route path="/success" element={<VerifyPayment />} />
+          <Route path="/cancel" element={<VerifyPayment />} />
         </Routes>
         <Footer />
       </div>
