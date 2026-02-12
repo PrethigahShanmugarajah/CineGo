@@ -31,13 +31,11 @@ const Navbar = () => {
 
   useEffect(() => {
     const readAuthFromStorage = () => {
-      // const json = localStorage.getItem("cine_auth");
       const json = localStorage.getItem("cinego_auth");
 
       if (json) {
         try {
           const parsed = JSON.parse(json);
-          // setIsLoggedIn(Boolean(parsed?.isLoggedIn));
           setIsLoggedIn(Boolean(parsed?.isLoggedIn === true));
 
           setUserEmail(parsed?.email || "");
@@ -48,7 +46,7 @@ const Navbar = () => {
       const simpleFlog = localStorage.getItem("isLoggedIn");
       const email =
         localStorage.getItem("userEmail") ||
-        localStorage.getItem("cine_user_email");
+        localStorage.getItem("cinego_user_email");
 
       if (simpleFlog === "true") {
         setIsLoggedIn(true);
@@ -69,16 +67,24 @@ const Navbar = () => {
     readAuthFromStorage();
     const onStorage = (e) => {
       if (
-        ["cine_auth", "isLoggedIn", "userEmail", "cine_user_email"].includes(
-          e.key,
-        )
+        [
+          "cinego_auth",
+          "isLoggedIn",
+          "userEmail",
+          "cinego_user_email",
+        ].includes(e.key)
       ) {
         readAuthFromStorage();
       }
     };
 
     window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
+    window.addEventListener("cinego_auth_changed", readAuthFromStorage);
+
+    return () => {
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener("cinego_auth_changed", readAuthFromStorage);
+    };
   }, []);
 
   useEffect(() => {
@@ -102,13 +108,16 @@ const Navbar = () => {
   }, [isMenuOpen]);
 
   const handleLogout = () => {
-    // localStorage.removeItem("cine_auth");
     localStorage.removeItem("cinego_auth");
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("userEmail");
-    localStorage.removeItem("cine_user_email");
+    localStorage.removeItem("cinego_user_email");
+    localStorage.removeItem("token");
+
     setIsLoggedIn(false);
     setUserEmail("");
+
+    window.dispatchEvent(new Event("cinego_auth_changed"));
     window.location.href = "/login";
   };
 
