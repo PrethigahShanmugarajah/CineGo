@@ -3,6 +3,10 @@
   font-family: "Dancing Script", cursive;
 }
 
+.font-monoton {
+  font-family: "Monoton", cursive;
+}
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
@@ -56,4 +60,19 @@
     min-width: 220px !important;
     height: 124px !important;
   }
+}
+
+.carousel-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.carousel-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.trailer-card {
+  width: 220px;
+  height: 124px;
+  min-width: 220px;
 }
