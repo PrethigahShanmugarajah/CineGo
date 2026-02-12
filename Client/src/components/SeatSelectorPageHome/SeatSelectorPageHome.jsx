@@ -668,8 +668,10 @@ const SeatSelectorPageHome = () => {
                         const num = i + 1;
 
                         const id = seatId(row.id, num);
-                        const isBooked = booked.has(id);
-                        const isSelected = selected.has(id);
+                        const nid = normalizeSeatId(id);
+
+                        const isBooked = booked.has(nid);
+                        const isSelected = selected.has(nid);
 
                         return (
                           <button
