@@ -349,3 +349,29 @@ export function getImageUrl(candidate) {
   if (s.startsWith("http://") || s.startsWith("https://")) return s;
   return `${import.meta.env.VITE_BASEURL}/uploads/${s.replace(/uploads\//, "")}`;
 }
+
+/* -------- Get stored token from localStorage (small helper) -------- */
+export function getStoredToken() {
+  return (
+    localStorage.getItem("token") ||
+    localStorage.getItem("authToken") ||
+    localStorage.getItem("accessToken") ||
+    null
+  );
+}
+
+/* -------- Format duration in minutes into "Xh Ym" for booking page -------- */
+export const formatDurationBooking = (mins) => {
+  const h = Math.floor((mins || 0) / 60);
+  const m = (mins || 0) % 60;
+  return `${h}h ${m}m`;
+};
+
+/* -------- Format a datetime into readable time like "9:30 PM" -------- */
+export const formatTime = (d) =>
+  d
+    ? new Date(d).toLocaleTimeString("en-US", {
+        hour: "numeric",
+        minute: "2-digit",
+      })
+    : "Time unavailable";
