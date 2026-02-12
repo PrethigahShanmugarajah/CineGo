@@ -167,10 +167,6 @@ const SignUpPage = () => {
           );
         }
 
-        // setTimeout(() => {
-        //   window.location.href = "/login";
-        // }, 1200);
-
         navigate("/");
       } else {
         toast.warn(response?.data?.message);
