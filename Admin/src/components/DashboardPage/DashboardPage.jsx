@@ -23,7 +23,7 @@ const DashboardPage = () => {
       try {
         /* -------- Movies -------- */
         try {
-          const mRes = await api.get(API_ROUTES.MOVIE.MOVIE_GET);
+          const mRes = await api.get(API_ROUTES.MOVIE.MOVIES_GET);
 
           console.log("Fetch Movies API Response:", mRes);
 
