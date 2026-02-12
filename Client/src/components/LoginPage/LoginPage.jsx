@@ -55,12 +55,12 @@ const LoginPage = () => {
         }
 
         try {
-          const userToStore = data.user || { email: formData.email };
+          // const userToStore = data.user || { email: formData.email };
+          const userToStore = response?.data?.user || { email: formData.email };
 
           localStorage.setItem(
             "cinego_auth",
             JSON.stringify({
-              // isLogged: true,
               isLoggedIn: true,
               email: userToStore.email || formData.email,
             }),
@@ -79,13 +79,13 @@ const LoginPage = () => {
           );
 
           localStorage.setItem("user", JSON.stringify(userToStore));
+
+          window.dispatchEvent(new Event("cinego_auth_changed"));
+
+          navigate("/");
         } catch (error) {
           console.warn("Failed to persist full user object");
         }
-
-        // setTimeout(() => {
-        //   window.location.href = "/";
-        // }, 1200);
 
         navigate("/");
       } else {
