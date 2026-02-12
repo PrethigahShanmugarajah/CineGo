@@ -1,7 +1,6 @@
 // CineGo / Client / src / pages / MovieDetailPageHome / MovieDetailPageHome.jsx
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
-import movies from "../../assets/dummymoviedata";
 import { toast } from "react-toastify";
 import {
   ArrowLeft,
@@ -19,129 +18,298 @@ import {
   FallbackAvatar,
   formatDateKey,
   formatTimeInTZ,
+  getAuthToken,
   getEmbedUrl,
+  getImageUrl,
+  slotToISO,
   TOTAL_SEATS,
 } from "../../utils/helper.jsx";
+import api from "../../api/axios.js";
+import API_ROUTES from "../../api/api_route.js";
+import { ClipLoader } from "react-spinners";
 
 const MovieDetailPageHome = () => {
-  const { id } = useParams();
-  const movieId = Number(id);
-  const movie = useMemo(() => movies.find((m) => m.id === movieId), [movieId]);
-
+  const { id: movieIdParam } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [movie, setMovie] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [showTrailer, setShowTrailer] = useState(false);
   const [selectedTrailerId, setSelectedTrailerId] = useState(null);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [selectedDay, setSelectedDay] = useState(0);
   const [selectedTime, setSelectedTime] = useState(null);
+  const [bookedMap, setBookedMap] = useState({});
 
   useEffect(() => {
-    if (!movie) {
-      toast.error("Movie not found");
-    }
-  }, [movie]);
+    let mounted = true;
 
-  const showtimeDays = useMemo(() => {
-    if (!movie) return [];
+    (async function fetchMovie() {
+      setLoading(true);
 
-    const TZ = "Asia/Colombo";
-    const slotsByDate = {};
-
-    (movie.slots || []).forEach((raw) => {
-      let iso = null;
-      let audi = "Audi 1";
-
-      if (!raw) return;
-
-      if (typeof raw === "string") {
-        iso = raw;
-        audi = "Audi 1";
-      } else if (typeof raw === "object" && raw.time) {
-        iso = raw.time;
-        audi = raw.audi ?? "Audi";
-      } else {
+      if (!movieIdParam) {
+        setMovie(null);
+        setLoading(false);
         return;
       }
 
-      const d = new Date(iso);
-      if (Number.isNaN(d.getTime())) return;
+      try {
+        const response1 = await api.get(
+          API_ROUTES.MOVIE.MOVIE_GET(movieIdParam),
+        );
 
-      const dateKey = formatDateKey(d, TZ);
-      if (!slotsByDate[dateKey]) slotsByDate[dateKey] = [];
-      slotsByDate[dateKey].push({ iso, audi });
+        console.log("Fetch Movie API Response:", response1);
+
+        if (!mounted) return;
+
+        if (response1?.data?.success) {
+          const item =
+            response1.data.item ||
+            response1.data.data ||
+            response1.data.movie ||
+            response1.data;
+
+          if (item) {
+            if (
+              !item.producer &&
+              Array.isArray(item.producers) &&
+              item.producers.length
+            ) {
+              item.producer = item.producers[0];
+            }
+
+            if (
+              item.poster &&
+              typeof item.poster === "string" &&
+              !item.poster.startsWith("http")
+            ) {
+              item.poster = getImageUrl(item.poster);
+            }
+
+            if (
+              item.thumbnail &&
+              typeof item.thumbnail === "string" &&
+              !item.thumbnail.startsWith("http")
+            ) {
+              item.thumbnail = getImageUrl(item.thumbnail);
+            }
+
+            ["cast", "directors", "producers"].forEach((k) => {
+              if (Array.isArray(item[k])) {
+                item[k] = item[k].map((p) => {
+                  if (!p) return p;
+
+                  const preview =
+                    p.preview ||
+                    (p.file ? getImageUrl(p.file) : null) ||
+                    (p.image ? getImageUrl(p.image) : null);
+
+                  return { ...p, preview, img: p.img || preview };
+                });
+              }
+            });
+          }
+
+          setMovie(item || null);
+
+          // toast.success(response1?.data?.message);
+          console.log("Fetch Movie Success:", response1?.data?.message);
+        } else {
+          toast.warn(response1?.data?.message);
+          console.warn("Fetch Movie Data Error:", response1?.data?.message);
+          setMovie(null);
+        }
+      } catch (error1) {
+        if (!mounted) return;
+
+        toast.error(error1?.response?.data?.message || error1?.message);
+        console.error("Booking Movies Error:", error1);
+        setMovie(null);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    })();
+
+    return () => (mounted = false);
+  }, [movieIdParam]);
+
+  useEffect(() => {
+    if (!movie && !loading) toast.error("Movie not found.");
+  }, [movie, loading]);
+
+  const showtimeDays = useMemo(() => {
+    if (!movie) return [];
+    const TZ = "Asia/Colombo";
+    const slotsByDate = {};
+    const rawSlots =
+      (Array.isArray(movie.slots) && movie.slots.length && movie.slots) ||
+      (Array.isArray(movie.showtimes) &&
+        movie.showtimes.length &&
+        movie.showtimes) ||
+      (Array.isArray(movie._normalizedSlots) &&
+        movie._normalizedSlots.length &&
+        movie._normalizedSlots) ||
+      [];
+
+    rawSlots.forEach((raw) => {
+      try {
+        const iso = slotToISO(raw);
+        if (!iso) return;
+        const d = new Date(iso);
+        if (Number.isNaN(d.getTime())) return;
+        const dateKey = formatDateKey(d, TZ);
+        if (!slotsByDate[dateKey]) slotsByDate[dateKey] = [];
+        const audi = (raw && raw.audi) || (raw && raw.auditorium) || "Audi";
+        slotsByDate[dateKey].push({ iso, audi });
+      } catch (error) {}
     });
+    return Object.keys(slotsByDate)
+      .sort()
+      .map((key) => {
+        const [yy, mm, dd] = key.split("-").map(Number);
+        const asDate = new Date(Date.UTC(yy, mm - 1, dd));
+        const dayName = new Intl.DateTimeFormat("en-US", {
+          weekday: "long",
+          timeZone: TZ,
+        }).format(asDate);
+        const shortDay = new Intl.DateTimeFormat("en-US", {
+          weekday: "short",
+          timeZone: TZ,
+        }).format(asDate);
+        const showtimes = (slotsByDate[key] || [])
+          .map(({ iso, audi }) => {
+            const d = new Date(iso);
+            if (Number.isNaN(d.getTime())) return null;
+            return {
+              time: formatTimeInTZ(d, TZ),
+              datetime: iso,
+              timestamp: d.getTime(),
+              audi,
+            };
+          })
+          .filter(Boolean)
+          .sort((a, b) => a.timestamp - b.timestamp);
+        const dateStr = new Intl.DateTimeFormat("en-US", {
+          month: "short",
+          day: "2-digit",
+          timeZone: TZ,
+        }).format(asDate);
 
-    const dateKeys = Object.keys(slotsByDate).sort();
-
-    const days = dateKeys.map((key) => {
-      const [yy, mm, dd] = key.split("-").map(Number);
-      const asDate = new Date(Date.UTC(yy, mm - 1, dd));
-      const dayName = new Intl.DateTimeFormat("en-US", {
-        weekday: "long",
-        timeZone: TZ,
-      }).format(asDate);
-      const shortDay = new Intl.DateTimeFormat("en-US", {
-        weekday: "short",
-        timeZone: TZ,
-      }).format(asDate);
-      const dateStr = new Intl.DateTimeFormat("en-US", {
-        weekday: "short",
-        day: "numeric",
-        timeZone: TZ,
-      }).format(asDate);
-
-      const rawSlots = slotsByDate[key] || [];
-
-      const showtimes = rawSlots
-        .map(({ iso, audi }) => {
-          const d = new Date(iso);
-          if (Number.isNaN(d.getTime())) return null;
-          const timeLabel = formatTimeInTZ(iso, TZ);
-          return {
-            time: timeLabel,
-            datetime: iso,
-            timestamp: d.getTime(),
-            audi,
-          };
-        })
-        .filter(Boolean)
-        .sort((a, b) => a.timestamp - b.timestamp)
-        .map(({ time, datetime, audi }) => ({ time, datetime, audi }));
-
-      return {
-        date: key,
-        dayName,
-        shortDay,
-        dateStr,
-        showtimes,
-      };
-    });
-
-    return days;
+        return { date: key, dayName, shortDay, dateStr, showtimes };
+      });
   }, [movie]);
 
   useEffect(() => {
-    if (showtimeDays.length === 0) {
+    if (!showtimeDays.length) {
       setSelectedDay(0);
       setSelectedTime(null);
       return;
     }
-    setSelectedDay((cur) => {
-      const newIndex = cur >= 0 && cur < showtimeDays.length ? cur : 0;
-      return newIndex;
-    });
+    setSelectedDay((cur) => (cur >= 0 && cur < showtimeDays.length ? cur : 0));
     setSelectedTime(null);
   }, [showtimeDays]);
 
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      if (!movie) {
+        setBookedMap({});
+        return;
+      }
+
+      const movieId = movie._id || movie.id || movieIdParam;
+
+      if (!movieId) {
+        setBookedMap({});
+        return;
+      }
+
+      const token = getAuthToken();
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+      try {
+        const response2 = await api.get(API_ROUTES.BOOKING.BOOKING_GET, {
+          params: { movieId, limit: 1000 },
+          headers,
+          timeout: 15000,
+        });
+
+        console.log("Fetch Movie API Response:", response2);
+
+        if (response2?.data?.success) {
+          let items = [];
+
+          if (Array.isArray(response2?.data?.items))
+            items = response2.data.items;
+          else if (Array.isArray(response2?.data)) items = response2.data;
+          else if (Array.isArray(response2?.data?.bookings))
+            items = response2.data.bookings;
+
+          const map = {};
+
+          const blockingStatus = new Set([
+            "pending",
+            "paid",
+            "active",
+            "confirmed",
+            "upcoming",
+          ]);
+
+          for (const b of items) {
+            if (!b) continue;
+
+            const status = String(b.status || "").toLowerCase();
+            if (!blockingStatus.has(status)) continue;
+
+            const show = b.showtime || b.slot || b.datetime || b.time || null;
+            if (!show) continue;
+
+            const audi = b.auditorium || b.audi || "Audi 1";
+
+            const seatsArr = Array.isArray(b.seats) ? b.seats : [];
+            const seatCount = seatsArr.length;
+
+            const key = `${show}_${audi}`;
+            map[key] = (map[key] || 0) + seatCount;
+          }
+
+          if (mounted) setBookedMap(map);
+
+          // toast.success(response2?.data?.message);
+          console.log("Fetch Movie Success:", response2?.data?.message);
+        } else {
+          toast.warn(response2?.data?.message);
+          console.warn("Fetch Movie Data Error:", response2?.data?.message);
+        }
+      } catch (error2) {
+        toast.error(error2?.response?.data?.message || error2?.message);
+        console.error("Booking Movies Error:", error2);
+        if (mounted) setBookedMap({});
+      }
+    })();
+
+    return () => {
+      mounted = false;
+    };
+  }, [movie, movieIdParam]);
+
   const openTrailer = (movieObj) => {
-    const idFromField = movieObj?.trailerId ?? null;
-    const id = idFromField || extractYouTubeId(movieObj?.trailer || " ");
+    const trailerCandidate =
+      movieObj?.trailerUrl ||
+      movieObj?.trailer ||
+      movieObj?.trailerId ||
+      movieObj?.latestTrailer?.videoId ||
+      movieObj?.latestTrailer?.url ||
+      null;
+
+    const id = extractYouTubeId(trailerCandidate || "");
+
     if (!id) {
-      toast.info("Trailer not available for this movie");
+      toast.info("Trailer not available for this movie.");
       return;
     }
+
     setSelectedMovie(movieObj);
     setSelectedTrailerId(id);
     setShowTrailer(true);
@@ -152,6 +320,15 @@ const MovieDetailPageHome = () => {
     setSelectedTrailerId(null);
     setSelectedMovie(null);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black text-white col-span-full text-center  py-8 border border-purple-800 rounded-lg gap-3">
+        <ClipLoader size={18} color="#A855F7" />
+        <span className="text-sm font-medium animate-pulse">Loading...</span>
+      </div>
+    );
+  }
 
   if (!movie) {
     return (
@@ -169,35 +346,45 @@ const MovieDetailPageHome = () => {
     );
   }
 
-  const buildSelectorPath = (movieIdParams, datetime) => {
+  const buildSeatSelectorPath = (movieIdlocal, datetime) => {
     const key = encodeURIComponent(datetime);
-    const pathLower = (location.pathname || "").toLowerCase();
-    const usesSingular = pathLower.includes("/movie/");
+    const usesSingular = (location.pathname || "")
+      .toLowerCase()
+      .includes("/movie/");
 
-    if (usesSingular) {
-      return `/movie/${movieIdParams}/seat-selector/${key}`;
-    }
-    return `/movies/${movieIdParams}/seat-selector/${key}`;
+    const mid = movie._id || movie.id || movieIdlocal || movieIdParam;
+
+    return usesSingular
+      ? `/movie/${mid}/seat-selector/${key}`
+      : `/movies/${mid}/seat-selector/${key}`;
   };
 
   const handleTimeSelect = (datetime) => {
     setSelectedTime(datetime);
-    const path = buildSelectorPath(movie.id, datetime);
-    navigate(path);
+    navigate(
+      buildSeatSelectorPath(movie._id || movie.id || movieIdParam, datetime),
+    );
   };
 
   const handleBookNow = () => {
-    if (selectedTime) {
-      const path = buildSelectorPath(movie.id, selectedTime);
-      navigate(path);
-    } else {
-      toast.error("Please select a showtime first");
-    }
+    if (selectedTime)
+      navigate(
+        buildSeatSelectorPath(
+          movie._id || movie.id || movieIdParam,
+          selectedTime,
+        ),
+      );
+    else toast.error("Please select a show time first.");
   };
 
-  const getBookedCountFor = (datetime, audi = "Audi 1") => {
+  const getBookedCountFor = (datetime) => {
     try {
-      const keyWithAudi = `bookings_${movie.id}_${datetime}_${audi}`;
+      const key = `${datetime}__${audi}`;
+      if (bookedMap && typeof bookedMap[key] === "number")
+        return bookedMap[key];
+
+      const mid = movie._id || movie.id || movieIdParam;
+      const keyWithAudi = `bookings_${mid}_${datetime}_${audi}`;
       const rawWith = localStorage.getItem(keyWithAudi);
 
       if (rawWith) {
@@ -205,26 +392,49 @@ const MovieDetailPageHome = () => {
         if (Array.isArray(arr)) return arr.length;
       }
 
-      const legacyKey = `bookings_${movie.id}_${datetime}`;
+      const legacyKey = `bookings_${mid}_${datetime}`;
       const rawLegacy = localStorage.getItem(legacyKey);
+
       if (rawLegacy) {
         const arrLegacy = JSON.parse(rawLegacy);
         if (Array.isArray(arrLegacy)) return arrLegacy.length;
       }
+
       return 0;
-    } catch (error) {
+    } catch {
       return 0;
     }
   };
 
-  const firstShowtime = useMemo(() => {
-    if (!showtimeDays.length) return null;
-    for (const day of showtimeDays) {
-      if (day.showtimes && day.showtimes.length)
-        return day.showtimes[0].datetime;
-    }
-    return null;
-  }, [showtimeDays]);
+  const posterSrc =
+    movie.img ||
+    movie.thumbnail ||
+    movie.poster ||
+    movie.posterUrl ||
+    (movie.thumbnail &&
+    typeof movie.thumbnail === "string" &&
+    movie.thumbnail.startsWith("http")
+      ? movie.thumbnail
+      : `${import.meta.env.VITE_BASEURL}/uploads/placeholder.png`);
+
+  const categoryList = Array.isArray(movie.categories)
+    ? movie.categories
+    : Array.isArray(movie.genres)
+      ? movie.genres
+      : movie.genre
+        ? [movie.genre]
+        : [];
+
+  const producer =
+    (Array.isArray(movie.producers) && movie.producers[0]) ||
+    movie.producer ||
+    null;
+
+  const producerImg = producer
+    ? producer.img ||
+      producer.preview ||
+      (producer.file ? getImageUrl(producer.file) : null)
+    : null;
 
   return (
     <div className="min-h-screen bg-linear-to-b from-black to-gray-900 text-white py-8 px-4">
@@ -272,7 +482,7 @@ const MovieDetailPageHome = () => {
         {/* -------- Title -------- */}
         <div className="text-center mb-6 sm:mb-12">
           <h1 className="movie-title text-2xl sm:text-4xl md:text-5xl lg:text-7xl py-1 font-bold tracking-wider mb-4 bg-linear-to-r from-white to-gray-300 bg-clip-text text-transparent">
-            {movie.title}
+            {movie?.title || movie?.movieName || movie?.name}
           </h1>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 text-sm sm:text-lg text-gray-300">
@@ -287,7 +497,7 @@ const MovieDetailPageHome = () => {
             </span>
 
             <span className="px-3 py-1 bg-purple-900/40 rounded-full text-purple-300 text-xs sm:text-sm border border-purple-700/30">
-              {movie.genre}
+              {categoryList.join(", ")}
             </span>
           </div>
         </div>
@@ -299,7 +509,7 @@ const MovieDetailPageHome = () => {
             <div className="bg-linear-to-br from-black/80 to-gray-900 rounded-2xl p-4 sm:p-6 border border-purple-700/20 shadow-2xl">
               <div className="movie-poster relative overflow-hidden rounded-xl mx-auto w-full">
                 <img
-                  src={movie.img}
+                  src={posterSrc}
                   alt={movie.title}
                   loading="lazy"
                   onError={(e) => {
@@ -472,7 +682,7 @@ const MovieDetailPageHome = () => {
           </h2>
 
           <p className="text-gray-300 leading-relaxed text-sm sm:text-base md:text-lg text-center max-w-4xl mx-auto">
-            {movie.synopsis}
+            {movie?.story || movie?.synopsis || "Story not available."}
           </p>
         </div>
 
@@ -486,18 +696,20 @@ const MovieDetailPageHome = () => {
 
             <div className="flex flex-col items-center">
               {(() => {
-                const directors = Array.isArray(movie.director)
-                  ? movie.director
-                  : movie.director
-                    ? [movie.director]
-                    : [];
+                const directors = Array.isArray(movie.directors)
+                  ? movie.directors
+                  : Array.isArray(movie.director)
+                    ? movie.director
+                    : movie.director
+                      ? [movie.director]
+                      : [];
 
                 return (
                   <div className="flex gap-4 sm:gap-6 items-start justify-center">
                     {directors.length ? (
                       directors.slice(0, 2).map((d, i) => (
                         <div key={i} className="flex flex-col items-center">
-                          {d?.img ? (
+                          {d?.img || d?.preview ? (
                             <img
                               src={d.img}
                               alt={d.name || `Director ${i + 1}`}
@@ -514,7 +726,7 @@ const MovieDetailPageHome = () => {
                             </div>
                           )}
                           <div className="font-semibold text-sm sm:text-base">
-                            {d.name ?? "N/A"}
+                            {d?.name || "N/A"}
                           </div>
                         </div>
                       ))
@@ -542,9 +754,9 @@ const MovieDetailPageHome = () => {
             </div>
 
             <div className="flex flex-col items-center">
-              {movie.producer?.img ? (
+              {producer?.img || producer?.preview ? (
                 <img
-                  src={movie.producer.img}
+                  src={producerImg}
                   alt={movie.producer.name}
                   loading="lazy"
                   className="w-20 h-20 sm:w-24 sm:h-24 rounded-full object-cover border-2 border-purple-600/30 mb-3 sm:mb-4"
@@ -559,7 +771,7 @@ const MovieDetailPageHome = () => {
               )}
 
               <div className="font-semibold text-sm sm:text-base">
-                {movie.producer?.name ?? "N/A"}
+                {producer?.name ?? "N/A"}
               </div>
             </div>
           </div>
