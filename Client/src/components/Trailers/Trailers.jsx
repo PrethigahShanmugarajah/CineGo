@@ -47,7 +47,7 @@ const Trailers = () => {
     async function loadLatestTrailers() {
       try {
         const response = await api.get(
-          API_ROUTES.MOVIE.MOVIE_GET_LATEST_TRAILER,
+          API_ROUTES.MOVIE.MOVIES_GET_LATEST_TRAILER,
           { signal: ac.signal },
         );
 
@@ -198,10 +198,7 @@ const Trailers = () => {
           {/* -------- Left Side -------- */}
           <div className="w-full md:w-1/2 lg:w-2/5">
             <div className="bg-white font-[pacifico] rounded-xl shadow-lg p-5 md:p-6">
-              <h2
-                className="text-2xl font-semibold mb-4 flex items-center gap-2"
-                style={{ fontFamily: "Monoton, cursive" }}
-              >
+              <h2 className="font-monoton text-2xl font-semibold mb-4 flex items-center gap-2">
                 <Clapperboard className="text-purple-600" /> Latest Trailers
               </h2>
 
@@ -229,23 +226,17 @@ const Trailers = () => {
 
               <div
                 ref={carouselRef}
-                className="flex overflow-x-auto scrollbar-hide space-x-3 pb-3 -mx-1"
-                style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+                className="carousel-scroll flex overflow-x-auto scrollbar-hide space-x-3 pb-3 -mx-1"
               >
                 {dataToRender.map((trailer) => (
                   <div
                     key={trailer.id}
                     data-id={trailer.id}
-                    className={`flex-none rounded-lg overflow-hidden relative cursor-pointer transition-all transform ${
+                    className={`trailer-card flex-none rounded-lg overflow-hidden relative cursor-pointer transition-all transform ${
                       featuredTrailer.id === trailer.id
                         ? "ring-2 ring-purple-600 shadow-md scale-100"
                         : "hover:scale-[1.02] hover:ring-1 hover:ring-purple-400"
                     }`}
-                    style={{
-                      width: "220px",
-                      height: "124px",
-                      minWidth: "220px",
-                    }}
                     onClick={() => selectTrailer(trailer)}
                     role="button"
                     tabIndex={0}
