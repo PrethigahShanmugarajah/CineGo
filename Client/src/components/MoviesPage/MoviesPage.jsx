@@ -34,7 +34,7 @@ const MoviesPage = () => {
       setError(null);
 
       try {
-        const response1 = await api.get(API_ROUTES.MOVIE.MOVIE_GET_NORMAL, {
+        const response1 = await api.get(API_ROUTES.MOVIE.MOVIES_GET_NORMAL, {
           signal: ac.signal,
         });
 
@@ -66,7 +66,7 @@ const MoviesPage = () => {
         console.error("Fetch Normal Movie Error:", error1);
 
         try {
-          const response2 = await api.get(API_ROUTES.MOVIE.MOVIE_GET, {
+          const response2 = await api.get(API_ROUTES.MOVIE.MOVIES_GET, {
             signal: ac.signal,
           });
 
