@@ -2,7 +2,6 @@
 import Banner from "../components/Banner/Banner";
 import Movies from "../components/Movies/Movies";
 import Trailers from "../components/Trailers/Trailers";
-import News from "../components/News/News";
 
 const Home = () => {
   return (
@@ -10,7 +9,6 @@ const Home = () => {
       <Banner />
       <Movies />
       <Trailers />
-      <News />
     </div>
   );
 };
