@@ -1,5 +1,3 @@
-// CineGo / Client / src / utils / helper.jsx
-
 /* -------- Placeholder image URL for movies without poster -------- */
 export const PLACEHOLDER_IMG =
   "https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/1920px-No-Image-Placeholder.svg.png";
@@ -293,8 +291,10 @@ export const to24Hour = (timeStr = "00:00", ampm = "") => {
   let h = Number(hRaw || 0);
   const m = String(Number(mRaw) || 0).padStart(2, "0");
   const a = (ampm || "").toUpperCase();
+  if (h > 12) return `${String(h).padStart(2, "0")}:${m}`;
   if (a === "AM" && h === 12) h = 0;
-  if (a === "PM" && h !== 12) h += 12;
+  // if (a === "PM" && h !== 12) h += 12;
+  if (a === "PM" && h !== 12 && h < 12) h += 12;
   return `${String(h).padStart(2, "0")}:${m}`;
 };
 

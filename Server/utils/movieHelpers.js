@@ -1,4 +1,3 @@
-// CineGo / Server / utils / movieHelpers.js
 import path from "path";
 import fs from "fs";
 

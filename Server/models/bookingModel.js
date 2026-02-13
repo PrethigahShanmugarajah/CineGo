@@ -1,4 +1,3 @@
-// CineGo / Server / models / bookingModel.js
 import mongoose, { Schema } from "mongoose";
 
 const bookingSchema = new mongoose.Schema(

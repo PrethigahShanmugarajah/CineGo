@@ -1,4 +1,3 @@
-// CineGo / Server / models / movieModel.js
 import mongoose from "mongoose";
 
 const personSchema = new mongoose.Schema(

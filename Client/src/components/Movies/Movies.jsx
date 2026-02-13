@@ -1,6 +1,4 @@
-// CineGo / Client / src / components / Movies / Movies.jsx
 import { useEffect, useState } from "react";
-import { moviesStyles } from "../../assets/dummyStyles";
 import { Link } from "react-router-dom";
 import { Tickets } from "lucide-react";
 import api from "../../api/axios";
@@ -26,14 +24,11 @@ const Movies = () => {
           signal: ac.signal,
         });
 
-        console.log("Featured Featured Movies API Response:", response);
+        // console.log("Featured Featured Movies API Response:", response);
 
         if (response?.data?.success) {
           // toast.success(response?.data?.message);
-          console.log(
-            "Fetch Featured Movies Success:",
-            response?.data?.message,
-          );
+          // console.log("Fetch Featured Movies Success:",response?.data?.message);
 
           const json = response.data;
 
@@ -87,7 +82,7 @@ const Movies = () => {
   const visibleMovies = movies.slice(0, 6);
 
   return (
-    <section className={moviesStyles.container}>
+    <section className="px-4 py-8 sm:py-12 max-w-6xl mx-auto">
       <h2 className="featured-title text-3xl sm:text-4xl md:text-5xl text-center mb-8">
         Featured Movies
       </h2>
@@ -104,7 +99,7 @@ const Movies = () => {
           No featured movies found.
         </div>
       ) : (
-        <div className={moviesStyles.grid}>
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-6 gap-6">
           {movies.map((m) => {
             const rawImg =
               m.poster || m.latestTrailer?.thumbnail || m.thumbnail || null;

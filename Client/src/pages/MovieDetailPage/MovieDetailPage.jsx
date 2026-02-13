@@ -1,4 +1,3 @@
-// CineGo / Client / src / pages / MovieDetailPage / MovieDetailPage.jsx
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -59,7 +58,7 @@ const MovieDetailPage = () => {
           API_ROUTES.MOVIE.MOVIE_GET(movieIdParam),
         );
 
-        console.log("Fetch Movie API Response:", response1);
+        // console.log("Fetch Movie API Response:", response1);
 
         if (!mounted) return;
 
@@ -114,7 +113,7 @@ const MovieDetailPage = () => {
           setMovie(item || null);
 
           // toast.success(response1?.data?.message);
-          console.log("Fetch Movie Success:", response1?.data?.message);
+          // console.log("Fetch Movie Success:", response1?.data?.message);
         } else {
           toast.warn(response1?.data?.message);
           console.warn("Fetch Movie Data Error:", response1?.data?.message);
@@ -235,7 +234,7 @@ const MovieDetailPage = () => {
           timeout: 15000,
         });
 
-        console.log("Fetch Movie API Response:", response2);
+        // console.log("Fetch Movie API Response:", response2);
 
         if (response2?.data?.success) {
           let items = [];
@@ -277,7 +276,7 @@ const MovieDetailPage = () => {
           if (mounted) setBookedMap(map);
 
           // toast.success(response2?.data?.message);
-          console.log("Fetch Movie Success:", response2?.data?.message);
+          // console.log("Fetch Movie Success:", response2?.data?.message);
         } else {
           toast.warn(response2?.data?.message);
           console.warn("Fetch Movie Data Error:", response2?.data?.message);
@@ -379,7 +378,7 @@ const MovieDetailPage = () => {
 
   const getBookedCountFor = (datetime) => {
     try {
-      const key = `${datetime}__${audi}`;
+      const key = `${datetime}_${audi}`;
       if (bookedMap && typeof bookedMap[key] === "number")
         return bookedMap[key];
 
@@ -552,7 +551,7 @@ const MovieDetailPage = () => {
 
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-4">
                 {showtimeDays[selectedDay]?.showtimes.map((showtime, index) => {
-                  const bookedCount = getBookedCountFor(showtime.datetime);
+                  const bookedCount = getBookedCountFor(showtime?.datetime);
                   const isSoldOut = bookedCount >= TOTAL_SEATS;
 
                   return (
@@ -564,17 +563,14 @@ const MovieDetailPage = () => {
                           ? "bg-purple-600 text-white border-purple-500/50 transform scale-105"
                           : "bg-gray-800/40 text-gray-200 border-gray-700/50 hover:bg-purple-600 hover:text-white hover:border-purple-500/50"
                       }`}
-                      title={
-                        isSoldOut
-                          ? "All seats booked for this showtime"
-                          : `Seats available: ${Math.max(
-                              0,
-                              TOTAL_SEATS - bookedCount,
-                            )}`
-                      }
+                      // title={
+                      //   isSoldOut
+                      //     ? "All seats booked for this showtime"
+                      //     : `Seats available: ${Math.max(0,TOTAL_SEATS - bookedCount)}`
+                      // }
                       aria-disabled={isSoldOut}
                     >
-                      <span>{showtime.time}</span>
+                      <span>{showtime?.time}</span>
                       {isSoldOut && (
                         <span className="ml-2 px-2 py-0.5 rounded-full text-xs bg-purple-700/90 text-white font-bold">
                           Sold Out

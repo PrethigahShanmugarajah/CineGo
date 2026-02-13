@@ -1,4 +1,3 @@
-// CineGo / Client / src / components / News / News.jsx
 import { sampleNews } from "../../assets/newdummydata";
 import { Calendar, Clock, Image, Sparkles } from "lucide-react";
 import "./News.css";

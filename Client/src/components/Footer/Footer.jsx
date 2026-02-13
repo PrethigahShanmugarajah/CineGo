@@ -1,4 +1,3 @@
-// CineGo / Client / src / components / Footer / Footer.jsx
 import { useEffect, useState } from "react";
 import {
   ArrowUp,
@@ -202,7 +201,7 @@ const Footer = () => {
 
         <div className="relative h-px bg-linear-to-r from-transparent via-purple-600 to-transparent mb-8 sm:mb-10">
           <div className="absolute left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black p-1.5 sm:p-2 rounded-full border border-purple-600">
-            <Film className="h-5 w-5 sm:h-6 sm:w-6 text-purple-500" />
+            <Theater className="h-5 w-5 sm:h-6 sm:w-6 text-purple-500" />
           </div>
         </div>
 

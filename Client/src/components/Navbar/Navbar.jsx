@@ -1,4 +1,3 @@
-// CineGo / Client / src / components / Navbar / Navbar.jsx
 import { useEffect, useRef, useState } from "react";
 import {
   Calendar,

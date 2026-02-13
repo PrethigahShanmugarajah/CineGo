@@ -1,4 +1,3 @@
-// CineGo / Server / routes / movieRoutes.js
 import express from "express";
 import multer from "multer";
 import path from "path";
@@ -30,8 +29,6 @@ const upload = multer({ storage }).fields([
   { name: "castFiles", maxCount: 20 },
   { name: "directorFiles", maxCount: 20 },
   { name: "producerFiles", maxCount: 20 },
-  // { name: "ltDirectorFiles", maxCount: 20 },
-  // { name: "ltProducerFiles", maxCount: 20 },
   { name: "ltDirectorImages", maxCount: 20 },
   { name: "ltProducerImages", maxCount: 20 },
   { name: "ltSingerImages", maxCount: 20 },

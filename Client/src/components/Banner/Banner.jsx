@@ -1,4 +1,3 @@
-// CineGo / Client / src / components / Banner / Banner.jsx
 import Video from "../../assets/MovieBannerVideo.mp4";
 import { Info, Star, Tickets } from "lucide-react";
 import "./Banner.css";

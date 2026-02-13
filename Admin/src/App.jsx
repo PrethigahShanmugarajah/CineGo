@@ -1,11 +1,10 @@
-// CineGo / Admin / src / App.jsx
 import { Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
-import Home from "./pages/Home";
-import ListMovies from "./pages/ListMovies";
+import Dashboard from "./pages/Dashboard/Dashboard";
+import ListMovies from "./pages/ListMovies/ListMovies";
 import Navbar from "./components/Navbar";
-import Bookings from "./pages/Bookings";
-import AddMovie from "./pages/AddMovie";
+import AddMovie from "./pages/AddMovie/AddMovie";
+import Bookings from "./pages/Bookings/Bookings";
 
 const App = () => {
   return (
@@ -13,7 +12,7 @@ const App = () => {
       <ToastContainer theme="dark" style={{ zIndex: 9999 }} />
       <Navbar />
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Dashboard />} />
         <Route path="/listmovies" element={<ListMovies />} />
         <Route path="/addmovies" element={<AddMovie />} />
         <Route path="/bookings" element={<Bookings />} />

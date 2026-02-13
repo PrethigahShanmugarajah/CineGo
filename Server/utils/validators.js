@@ -1,4 +1,3 @@
-// CineGo / Server / utils / validators.js
 import jwt from "jsonwebtoken";
 
 /* -------- Validate Email -------- */

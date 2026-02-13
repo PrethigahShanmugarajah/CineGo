@@ -1,17 +1,16 @@
-// CineGo / Client / src / App.jsx
 import { useEffect } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar/Navbar";
-import Home from "./pages/Home";
+import Home from "./pages/Home/Home";
 import Footer from "./components/Footer/Footer";
-import Login from "./pages/Login";
+import Login from "./pages/Login/Login";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import SignUp from "./pages/SignUp";
-import Movie from "./pages/Movie";
-import Release from "./pages/Release";
-import Booking from "./pages/Booking";
-import Contact from "./pages/Contact";
+import SignUp from "./pages/SignUp/SignUp";
+import Movie from "./pages/Movie/Movie";
+import Release from "./pages/Release/Release";
+import Booking from "./pages/Booking/Booking";
+import Contact from "./pages/Contact/Contact";
 import MovieDetailPage from "./pages/MovieDetailPage/MovieDetailPage";
 import MovieDetailPageHome from "./pages/MovieDetailPageHome/MovieDetailPageHome";
 import SeatSelector from "./pages/SeatSelector/SeatSelector";

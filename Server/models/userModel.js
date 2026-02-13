@@ -1,4 +1,3 @@
-// CineGo / Server / models / userModel.js
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
@@ -10,7 +9,7 @@ const userSchema = new mongoose.Schema(
     birthDate: { type: Date, required: true },
     password: { type: String, required: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const User = mongoose.models.user || mongoose.model("User", userSchema);

@@ -1,4 +1,3 @@
-// CineGo / Server / utils / bookingHelpers.js
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import Stripe from "stripe";

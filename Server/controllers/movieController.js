@@ -1,4 +1,3 @@
-// CineGo / Server / controllers / movieController.js
 import mongoose from "mongoose";
 import Movie from "../models/movieModel.js";
 import {
@@ -18,12 +17,14 @@ export const createMovie = async (req, res) => {
     const posterUrl = req.files?.poster?.[0]?.filename
       ? getUploadUrl(req.files.poster[0].filename)
       : body.poster || null;
+
     const trailerUrl = req.files?.trailerUrl?.[0]?.filename
       ? getUploadUrl(req.files.trailerUrl[0].filename)
-      : body.poster || null;
+      : body.trailerUrl || null;
+
     const videoUrl = req.files?.videoUrl?.[0]?.filename
       ? getUploadUrl(req.files.videoUrl[0].filename)
-      : body.poster || null;
+      : body.videoUrl || null;
 
     const categories =
       safeParseJSON(body.categories) ||
@@ -84,10 +85,6 @@ export const createMovie = async (req, res) => {
         else latestTrailerBody[arrName][idx] = { name: "", file: filename };
       });
     };
-
-    // attachLFiles("ltDirectorFiles", "directors");
-    // attachLFiles("ltProducerFiles", "producers");
-    // attachLFiles("ltSingerFiles", "singers");
 
     attachLFiles("ltDirectorImages", "directors");
     attachLFiles("ltProducerImages", "producers");

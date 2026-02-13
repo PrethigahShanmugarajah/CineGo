@@ -1,4 +1,3 @@
-// CineGo / Client / src / components / Trailers / Trailers.jsx
 import { useEffect, useRef, useState } from "react";
 import {
   Calendar,
@@ -21,7 +20,7 @@ import {
 import { ClipLoader } from "react-spinners";
 
 const Trailers = () => {
-  const [featuredTrailer, setFeaturedTrailer] = useState([]);
+  const [featuredTrailer, setFeaturedTrailer] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
 
@@ -51,18 +50,18 @@ const Trailers = () => {
           { signal: ac.signal },
         );
 
-        console.log("Fetch Latest Trailer API Response:", response);
+        // console.log("Fetch Latest Trailer API Response:", response);
 
         const json = response.data;
 
         if (json?.success) {
           // toast.success(json?.message);
-          console.log("Fetch Latest Trailer Success:", json?.message);
+          // console.log("Fetch Latest Trailer Success:", json?.message);
 
           const items = pickArray(json);
           const mapped = items.map(mapMovieToTrailerItem);
 
-          console.log("Mapped Movies:", mapped);
+          // console.log("Mapped Movies:", mapped);
 
           setTrailers(mapped);
           setFeaturedTrailer(mapped[0] || null);
@@ -191,6 +190,16 @@ const Trailers = () => {
 
   const dataToRender = trailers || [];
 
+  if (!dataToRender.length || !featuredTrailer) {
+    return (
+      <div className="min-h-screen bg-linear-to-b from-gray-100 to-gray-300 text-black flex items-center justify-center">
+        <div className="text-center py-10 text-gray-500">
+          No trailers available
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-linear-to-b from-gray-100 to-gray-300 text-black">
       <main className="relative z-10 pt-20 pb-12 container mx-auto px-4 sm:px-6 lg:px-8">
@@ -201,6 +210,14 @@ const Trailers = () => {
               <h2 className="font-monoton text-2xl font-semibold mb-4 flex items-center gap-2">
                 <Clapperboard className="text-purple-600" /> Latest Trailers
               </h2>
+
+              {!featuredTrailer && (
+                <div className="min-h-screen flex items-center justify-center">
+                  <div className="text-center py-10 text-gray-500">
+                    No trailers available
+                  </div>
+                </div>
+              )}
 
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
@@ -233,7 +250,7 @@ const Trailers = () => {
                     key={trailer.id}
                     data-id={trailer.id}
                     className={`trailer-card flex-none rounded-lg overflow-hidden relative cursor-pointer transition-all transform ${
-                      featuredTrailer.id === trailer.id
+                      featuredTrailer?.id === trailer.id
                         ? "ring-2 ring-purple-600 shadow-md scale-100"
                         : "hover:scale-[1.02] hover:ring-1 hover:ring-purple-400"
                     }`}
@@ -244,7 +261,7 @@ const Trailers = () => {
                       if (e.key === "Enter" || e.key === "")
                         selectTrailer(trailer);
                     }}
-                    aria-pressed={featuredTrailer.id === trailer.id}
+                    aria-pressed={featuredTrailer?.id === trailer.id}
                   >
                     <img
                       src={trailer.thumbnail || PLACEHOLDER_IMG}
@@ -305,8 +322,8 @@ const Trailers = () => {
                   <div className="relative aspect-video ">
                     <iframe
                       className="w-full h-full"
-                      src={buildFrameSrc(featuredTrailer.videoUrl)}
-                      title={featuredTrailer.title}
+                      src={buildFrameSrc(featuredTrailer?.videoUrl)}
+                      title={featuredTrailer?.title}
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
@@ -326,8 +343,8 @@ const Trailers = () => {
                 ) : (
                   <div className="relative aspect-video group bg-gray-900">
                     <img
-                      src={featuredTrailer.thumbnail || PLACEHOLDER_IMG}
-                      alt={featuredTrailer.title}
+                      src={featuredTrailer?.thumbnail || PLACEHOLDER_IMG}
+                      alt={featuredTrailer?.title || "No trailer"}
                       className="w-full h-full object-cover"
                       loading="lazy"
                     />
@@ -346,24 +363,24 @@ const Trailers = () => {
               <div className="p-5 md:p-6">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
                   <h2 className="text-2xl font-bold font-dancing">
-                    {featuredTrailer.title}
+                    {featuredTrailer?.title}
                   </h2>
 
                   <div className="flex items-center space-x-4 text-sm text-black">
                     <span className="flex items-center">
                       <Clock size={16} className="mr-1 text-purple-600" />
-                      {featuredTrailer.duration}
+                      {featuredTrailer?.duration}
                     </span>
 
                     <span className="flex items-center">
                       <Calendar size={16} className="mr-1 text-purple-600" />
-                      {featuredTrailer.year}
+                      {featuredTrailer?.year}
                     </span>
                   </div>
                 </div>
 
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {featuredTrailer.genre.split(",").map((genre, index) => (
+                  {featuredTrailer?.genre?.split(",").map((genre, index) => (
                     <span
                       key={index}
                       className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium"
@@ -374,7 +391,7 @@ const Trailers = () => {
                 </div>
 
                 <p className="mt-4 text-gray-500">
-                  {featuredTrailer.description}
+                  {featuredTrailer?.description}
                 </p>
 
                 <div className="mt-6 font-[pacifico]">
@@ -382,7 +399,7 @@ const Trailers = () => {
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 items-start">
-                  {featuredTrailer.credits &&
+                  {featuredTrailer?.credits &&
                     Object.entries(featuredTrailer.credits).map(
                       ([role, person]) => (
                         <div

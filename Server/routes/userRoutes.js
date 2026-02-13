@@ -1,4 +1,3 @@
-// CineGo / Server / routes / userRoutes.js
 import express from "express";
 import {
   getUsers,

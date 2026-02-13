@@ -1,4 +1,3 @@
-// CineGo / Server / controllers / bookingController.js
 import dotenv from "dotenv";
 import {
   BLOCKING_STATUSES,
@@ -46,13 +45,6 @@ export const createBooking = async (req, res) => {
     const email = String(body.email || (req.user && req.user.email) || "");
     const paymentMethod = String(body.paymentMethod || "card").toLowerCase();
     const currency = String(body.currency || "lkr").toLowerCase();
-
-    // if (!body.showtime ||(rawSeats.length === 0 && seatIdsFromBody.length === 0) ||!email) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: "Missing required fields (showtime/seats/email).",
-    //   });
-    // }
 
     if (!body.showtime) {
       return res.status(400).json({
@@ -117,13 +109,6 @@ export const createBooking = async (req, res) => {
       allowClientPrice: true,
     });
 
-    // if (!totalPaise || totalPaise <= 0) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: "Computed amount is zero.",
-    //   });
-    // }
-
     if (!totalPaise) {
       return res.status(400).json({
         success: false,
@@ -170,6 +155,7 @@ export const createBooking = async (req, res) => {
     const seatIdList = Array.from(
       new Set(normalizedSeats.map((s) => s.seatId)),
     );
+
     const conflictingSeats = seatIdList.filter((s) => occupiedSeats.has(s));
 
     const movieSnapShot = movie
@@ -323,10 +309,8 @@ export const getBooking = async (req, res) => {
       });
     }
 
-    // const userId = String(req.user._id || req.user.id);
     const { paymentStatus, status } = req.query;
 
-    // const q = { userId };
     const userId = req.user._id || req.user.id;
 
     const q = {
@@ -340,19 +324,8 @@ export const getBooking = async (req, res) => {
     } else if (status && String(status).toLowerCase() !== "all") {
       q.status = String(status).toLowerCase();
     }
-    // else {
-    //   q.paymentStatus = "paid";
-    // }
 
     const items = await Booking.find(q).sort({ createdAt: -1 }).lean().exec();
-
-    // if (!items || items.length === 0) {
-    //   return res.status(200).json({
-    //     success: true,
-    //     message: "No bookings found.",
-    //     items: [],
-    //   });
-    // }
 
     if (!items) {
       return res.status(200).json({
@@ -403,9 +376,6 @@ export const listBookings = async (req, res) => {
     } else if (status && String(status).toLowerCase() !== "all") {
       q.status = String(status).toLowerCase();
     }
-    // else {
-    //   q.paymentStatus = "paid";
-    // }
 
     const pg = Math.max(1, Number(page) || 1);
     const lim = Math.min(1000, Number(limit) || 100);
@@ -452,13 +422,6 @@ export const listBookings = async (req, res) => {
 export const deleteBooking = async (req, res) => {
   try {
     const { id } = req.params;
-
-    // if (!id || !mongoose.Types.ObjectId.isValid(id)) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: "Invalid ID.",
-    //   });
-    // }
 
     if (!id) {
       return res.status(400).json({
@@ -623,12 +586,6 @@ export const confirmPayment = async (req, res) => {
     }
 
     const bookingId = sessionObj.metadata?.bookingId;
-    // if (!bookingId || !mongoose.Types.ObjectId.isValid(bookingId)) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: "Invalid bookingId in session metadata.",
-    //   });
-    // }
 
     if (!bookingId) {
       return res.status(400).json({

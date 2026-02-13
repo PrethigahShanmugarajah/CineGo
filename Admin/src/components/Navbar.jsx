@@ -1,4 +1,3 @@
-// CineGo / Admin / src / components / Navbar.jsx
 import { useCallback, useEffect, useState } from "react";
 import {
   Calendar,
@@ -99,11 +98,6 @@ const Navbar = () => {
               className="inline-flex items-center justify-center p-2 rounded-md text-purple-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-600"
             >
               <span className="sr-only">Open main menu</span>
-              {/* {open ? (
-                <XIcon className="w-6 h-6" />
-              ) : (
-                <Menu className="w-6 h-6" />
-              )} */}
 
               <Menu className="w-6 h-6" />
             </button>

@@ -1,4 +1,3 @@
-// CineGo / Client / src / pages / MovieDetailPageHome / MovieDetailPageHome.jsx
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -59,7 +58,7 @@ const MovieDetailPageHome = () => {
           API_ROUTES.MOVIE.MOVIE_GET(movieIdParam),
         );
 
-        console.log("Fetch Movie API Response:", response1);
+        // console.log("Fetch Movie API Response:", response1);
 
         if (!mounted) return;
 
@@ -114,7 +113,7 @@ const MovieDetailPageHome = () => {
           setMovie(item || null);
 
           // toast.success(response1?.data?.message);
-          console.log("Fetch Movie Success:", response1?.data?.message);
+          // console.log("Fetch Movie Success:", response1?.data?.message);
         } else {
           toast.warn(response1?.data?.message);
           console.warn("Fetch Movie Data Error:", response1?.data?.message);
@@ -235,7 +234,7 @@ const MovieDetailPageHome = () => {
           timeout: 15000,
         });
 
-        console.log("Fetch Movie API Response:", response2);
+        // console.log("Fetch Movie API Response:", response2);
 
         if (response2?.data?.success) {
           let items = [];
@@ -277,7 +276,7 @@ const MovieDetailPageHome = () => {
           if (mounted) setBookedMap(map);
 
           // toast.success(response2?.data?.message);
-          console.log("Fetch Movie Success:", response2?.data?.message);
+          // console.log("Fetch Movie Success:", response2?.data?.message);
         } else {
           toast.warn(response2?.data?.message);
           console.warn("Fetch Movie Data Error:", response2?.data?.message);
@@ -297,8 +296,12 @@ const MovieDetailPageHome = () => {
   const openTrailer = (movieObj) => {
     const trailerCandidate =
       movieObj?.trailerUrl ||
+      movieObj?.videoUrl ||
+      movieObj?.videoId ||
       movieObj?.trailer ||
       movieObj?.trailerId ||
+      movieObj?.latestTrailer?.videoId ||
+      movieObj?.latestTrailer?.videoUrl ||
       movieObj?.latestTrailer?.videoId ||
       movieObj?.latestTrailer?.url ||
       null;
@@ -592,11 +595,11 @@ const MovieDetailPageHome = () => {
                               ? "bg-purple-600 text-white border-purple-500/50 transform scale-105"
                               : "bg-gray-800/40 text-gray-200 border-gray-700/50 hover:bg-purple-600 hover:text-white hover:border-purple-500/50"
                           }`}
-                        title={
-                          isSoldOut
-                            ? "All seats booked for this showtime"
-                            : `Seats available:${Math.max(0, TOTAL_SEATS - bookedCount)}`
-                        }
+                        // title={
+                        //   isSoldOut
+                        //     ? "All seats booked for this showtime"
+                        //     : `Seats available:${Math.max(0, TOTAL_SEATS - bookedCount)}`
+                        // }
                         aria-label={isSoldOut}
                       >
                         <span>{showtime.time}</span>
